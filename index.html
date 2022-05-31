@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Matematica Computacional</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style2.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="./css/index.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+       <div class="container-fluid">
+           <a class="navbar-brand titulo">
+               <img src="./img/img1.png" width="50" class="me-4 ms-3" id="imagen">
+              MATEMÁTICA COMPUTACIONAL: CALCULADORA
+           </a>
+           <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./MiPortafolio/index.html" target="_blank">Contacto</a>
+              </li>
+           </ul>
+       </div>
+    </nav>
+    <div class="container-fluid bg-dark">
+        <div class="row text-white ct">
+            <div class="col col-2  bg-dark c1 text-center">
+                <ul class="list-group  lista mt-4  mb-3">
+                    <li class="mb-2"onclick="activarContenido(div_expancion)">Expancion de  un histograma</li>
+                    <li class="mb-2"onclick="activarContenido(div_ecualizacion)">Ecualizacion de un histograma</li>
+                    <li class="mb-2">
+                        <div class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                              Filtros
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                              <li><a class="dropdown-item" onclick="activarContenido(div_laplaciano)" href="#">laplaciano</a></li>
+                              <li><a class="dropdown-item" onclick="activarContenido(div_media)" href="#">Media</a></li>
+                              <li><a class="dropdown-item" onclick="activarContenido(div_mediana)" href="#">Mediana</a></li>
+                            </ul>
+                          </div>
+                    </li>
+                    <li class="mb-3">
+                        <div class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                              Aritmetica Modular
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                              <li><a class="dropdown-item" onclick="activarContenido(div_congruencia)" href="#">Congruencias lineales</a></li>
+                              <li><a class="dropdown-item" onclick="activarContenido(div_encriptacion)" href="#">Encriptacion RSA</a></li>
+                            </ul>
+                          </div>
+                    </li>
+                    <li class="mb-3"onclick="activarContenido(div_matrizCaminos)">Matriz de Caminos</li>
+                    <li class="mb-3"onclick="activarContenido(div_conexas)">Componentes conexas</li>
+                    <li class="mb-3" onclick="irHamiltoniano()"><a href="./assets/hamiltoniano.html"   target="_blank" class="ancla">Ciclo Hamiltoniano</a></li>
+                    <li class="mb-3"><a href="https://graphonline.ru/es/"   target="_blank" class="ancla">Algoritmo de Ford-Fulkerson</a></li>
+                    <li class="mb-3"><a href="https://graphonline.ru/es/"   target="_blank" class="ancla">Algoritmo de Dikstra</a></li>
+                    <li class="mb-2"><a href="./assets/huffman/index.html"   target="_blank" class="ancla">Algoritmo de Huffman</a></li>
+                    <li class="mb-2" onclick="activarContenido(div_juegos)">Teoria de Juegos</li>
+                    <li class="mb-2"><a href="./assets/DiagramaHasse/index.html" target="_blank" class="ancla">Diagrama de Hasse</a></li>
+                    <li class="mb-2"><a href="./assets/tablas-verdad/index.html" target="_blank" class="ancla">Tablas de verdad</a></li>
+                </ul>
+            </div>
+            <div class="col col-8 col-sm-10 col-xl-8 text-center bg-light main">
+                <div class="contenedor rounded desactivado" id="matriz-caminos">
+                    <h3 class="text-white bg-dark ">Matriz de Caminos</h3>
+                    <div class="contenido d-flex  justify-content-center">
+                       <div class="caja">
+                           <p class="mt-3 text-dark">Matriz A:</p>
+                           <div class="d-flex  justify-content-center">
+                               <div class="matriz1">
+                                    <!-- contenido -->
+                               </div>
+                           </div>
+                           <div class="d-flex  justify-content-center p-2">
+                            <input type="button" value="1" onclick="completar(1)" class="me-2 btn-secondary">
+                            <input type="button" value="0" onclick="completar(0)"class="me-2 btn-secondary">
+                            <input type="button" value="C" onclick="completar('')" class="me-2 btn-danger">                            
+                            <input type="button" onclick="aumentarMatriz()" value="+"class="me-2 btn-dark">
+                            <input type="button" onclick="disminuirMatriz()" value="-"class="me-2 btn-success">
+                            <input type="button" class="btn-primary" onclick="aplicarAlgoritmo()" value="Aceptar"class="me-2">
+                           </div>
+                           <hr class="bg-dark">
+                           <p class="text-dark">Resultado</p>
+                           <div class="d-flex  justify-content-center">
+                            <div class="matriz2 mb-5">
+                                 <!-- contenido -->
+                            </div>
+                        </div>
+                       </div>
+
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="filtro-laplaciano">
+                    <h3 class="text-white bg-dark">Filtro de laplaciano</h3>
+                    <div class="contenido">
+                        <div class="d-flex mt-4">
+                            <div class="original ms-3 d-flex align-items-center">
+                                <div class="original-container shadow-sm">
+                                    <p class="text-dark">Matriz A:</p>
+                                    <div class="original-matriz mb-2">
+                                        <!-- contenido -->
+                                    </div>
+                                    <input type="button" value="+" onclick="GenerarMatriz('+')" class="btn-dark">
+                                    <input type="button" value="-" onclick="GenerarMatriz('-')" class="btn-warning">
+                                    <input type="button" value="C" onclick="LimpiarLaplaciano()" class="btn-danger">
+                                    <input type="button" value="Aceptar" onclick="resultadoLaplaciano()"  class="btn-primary">
+                                </div>
+                            </div>
+                            <div class="mascara ms-5 mt-3 shadow-sm">
+                                <p class="mb-1 text-dark">Mascara</p>
+                                <div class="mascara-matriz">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                    <input type="text" class="cj-mascara-laplaciano">
+                                </div>
+                                <input type="button" value="C" onclick="limpiarMascara()"  class="btn-danger me-2">
+                                <input type="button" value="-" onclick="CambiarValores('-')" class="btn-primary me-2">
+                                <input type="button" value="+" onclick="CambiarValores('+')" class="btn-success me-2">
+                            </div>
+                        </div>
+                        <div class="d-flex mt-3">
+                            <hr class="bg-dark w-50 me-3">
+                            <p class="text-dark">Resultado</p>
+                            <hr class="bg-dark w-50 ms-3">
+                        </div>
+                        <div class="resultado mb-5">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                            <input type="text" class="cj-resultado-laplaciano">
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="filtro-media">
+                    <h3 class="text-white bg-dark">Filtro de Media</h3>
+                    <div class="contenido">
+                        <div class="d-flex mt-4">
+                            <div class="original ms-3 d-flex align-items-center">
+                                <div class="original-container shadow-sm">
+                                    <p class="text-dark">Matriz A:</p>
+                                    <div class="original-matriz-media mb-2">
+                                        <!-- contenido -->
+                                    </div>
+                                    <input type="button" value="+" onclick="GenerarMatrizMedia('+')" class="btn-dark">
+                                    <input type="button" value="-" onclick="GenerarMatrizMedia('-')" class="btn-warning">
+                                    <input type="button" value="C" onclick="limpiarMedia()" class="btn-danger">
+                                    <input type="button" value="Aceptar" onclick="ResultadoMedia()"  class="btn-primary">
+                                </div>
+                            </div>
+                            <div class="mascara ms-5 mt-3 shadow-sm">
+                                <p class="mb-1 text-dark">Mascara</p>
+                                <div class="mascara-matriz">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                    <input type="text" class="cj-mascara-media">
+                                </div>
+                                <input type="button" value="C" onclick="limpiarMascaraMedia()"  class="btn-danger me-2">
+                                <input type="button" value="-" onclick="LlenarMascara('-')" class="btn-primary me-2">
+                                <input type="button" value="+" onclick="LlenarMascara('+')" class="btn-success me-2">
+                            </div>
+                        </div>
+                        <div class="d-flex mt-3">
+                            <hr class="bg-dark w-50 me-3">
+                            <p class="text-dark">Resultado</p>
+                            <hr class="bg-dark w-50 ms-3">
+                        </div>
+                        <div class="resultado-media mb-5">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                            <input type="text" class="cj-resultado-media">
+                        </div>
+                    </div>
+                        
+                </div>
+                <div class="contenedor rounded desactivado" id="filtro-mediana">
+                    <h3 class="text-white bg-dark">Filtro de Mediana</h3>
+                    <div class="contenido">
+                        <div class="original-mediana shadow-sm d-flex align-items-center justify-content-center">
+                            <div>
+                                <div class="matriz-mediana">
+                                    <!-- contenido -->
+                                </div>
+                                <div class="mt-2">
+                                    <input type="button" value="+" onclick="GenerarMatrizMediana('+')" class="btn-warning">
+                                    <input type="button" value="-" onclick="GenerarMatrizMediana('-')" class="btn-success">
+                                    <input type="button" value="C" onclick="limpiarMediana()" class="btn-danger">
+                                    <input type="button" value="Aceptar" onclick="ResultadoMediana()" class="btn-primary">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex mt-3">
+                            <hr class="bg-dark w-50 me-3">
+                            <p class="text-dark">Resultado</p>
+                            <hr class="bg-dark w-50 ms-3">
+                        </div>
+                        <div class="resultado-mediana mb-5">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                            <input type="text" class="cj-resultado-mediana">
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor rounded activado" id="expancion-histograma">
+                    <h3 class="text-white bg-dark">Expancion de un histograma</h3>
+                    <div class="contenido bg-secondary p-2">
+                        <div class="mt-3 text-white">
+                            <p class=" mb-1">Complete el histograma original</p>
+                            <div class="d-flex  justify-content-center">
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">0</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">1</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">2</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">3</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">4</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">5</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">6</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-expancion">
+                                    <label class="fw-light">7</label>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <input type="button" value="C" onclick="limpiarExpancion()" class="me-3 btn-limpiar btn-danger">
+                                <input type="button" onclick="dibujarHistogramaExpancion()" value="Resultado" class="btn-primary">
+                                <label class="ms-5">[</label>
+                                <input type="text" class="min text-center" value="1">
+                                <label >;</label>
+                                <input type="text" class="max text-center" value="7">
+                                <label >]</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Resultado mt-2 text-center">
+                        <h6 class="ms-auto text-dark">Histograma resultante</h6>
+                        <canvas class="canvas-expancion">
+                        </canvas>
+                        <div class="bg-success">
+                            <p class="ms-auto">Resultado</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="ecualizacion-histograma">
+                    <h3 class="text-white bg-dark">Ecualizacion de un histograma</h3>
+                    <div class="contenido bg-secondary p-2">
+                        <div class="mt-3 text-white">
+                            <p class=" mb-1">Complete el histograma original</p>
+                            <div class="d-flex  justify-content-center">
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">0</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">1</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">2</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">3</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">4</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">5</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">6</label>
+                                </div>
+                                <div class="d-flex flex-column"> 
+                                    <input type="text" class="cj-ecualizacion">
+                                    <label class="fw-light">7</label>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <input type="button" value="C" onclick="limpiarEcualizacion()" class="me-3 btn-limpiar btn-danger">
+                                <input type="button" onclick="dibujarHistogramaEcualizacion()" value="Resultado" class="btn-primary">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="Resultado mt-2 text-center">
+                        <h6 class="ms-auto text-dark">Histograma resultante</h6>
+                        <canvas class="canvas-ecualizacion">
+
+                        </canvas>
+                        <div class="bg-success">
+                            <p class="ms-auto">Resultado</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="congruencias">
+                    <h3 class="text-white bg-dark">Congruencias lineales</h3>
+                    <div class="contenido-congruencia mt-5 d-flex text-dark">
+                        <div class=" cont cont1 rounded-2">
+                            <h4 class="mt-3">ax=b mod n</h4>
+                            <div class="d-flex justify-content-around">
+                                <input type="text" class="caja2 txta">
+                                <h4>x=</h4>
+                                <input type="text" class="caja2 txtb">
+                                <h4>mod</h4>
+                                <input type="text" class="caja2 txtn">
+                            </div>
+                            <input type="button" value="C" onclick="limpiar()" class="btn-danger">
+                            <button class="btn-primary mt-3 boton" onclick="ResultadoCongruencia()">Resultado</button>
+                            <div class="resultado-congruencia mt-4">
+                                <h4 class="ms-auto txtrespuesta1"></h4>
+                                <h4 class="ms-auto txtrespuesta2"></h4>
+                            </div>
+                        </div>
+                        <div class="cont cont2 rounded-2">
+                            <h5 class="mb-3 mt-3"><ins>Resolucion:</ins></h5>
+                            <h6 class="paso1"></h6>
+                            <h6 class="paso2"></h6>
+                            <h6 class="paso3"></h6>
+                            <h6 class="paso4"></h6>
+                            <h6 class="paso5"></h6>
+                        </div>
+                    </div>
+                </div>
+                 <div class="contenedor rounded desactivado" id="encriptacion">
+                    <h3 class="text-white bg-dark">Encriptacion RSA</h3>
+                    <div class="contenido-encriptacion text-dark">
+                        <p class="mb-1 mt-3">Seleccione dos numeros primos</p>
+                        <input type="text" class="primos primo1">
+                        <input type="text" class="primos primo2">
+                        <input type="button" value="Aceptar" onclick="GenerarPrimos()" class="btn-primary">
+                        <div class="mt-3">
+                            <p class="mb-1">Seleccione un valor para 'd'</p>
+                            <div class="lista-encriptacion">
+                                <ul class="lista-primos list-group">
+                                </ul>
+                            </div> 
+                            <div class="mt-4 claves">
+                                <p class="clave-privada">Clave Privada: -</p>
+                                <p class="clave-publica">Clave Pública: -</p>
+                            </div>
+                            <div>
+                                <form>
+                                    <label>Encriptar </label>
+                                    <input type="radio" name="op" id="encriptar" class="me-2">
+                                    <label>Desencriptar </label>
+                                    <input type="radio" name="op" id="desencriptar" class="mb-3">
+                                    <br>
+                                    <label class="me-2">Valor: </label>
+                                    <input type="text" class="primos me-3 valor">
+                                    <input type="button" value="Resultado" onclick="ResultadoEncriptar()" class="btn-success">
+                                </form>
+                                <h6 class="mt-4 me-5 res">Resultado: -</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="conexas">
+                    <h3 class="text-white bg-dark">Componentes conexas</h3>
+                    <div class="contenido-conexas d-flex  justify-content-center">
+                        <div class="caja">
+                            <p class="mt-3 text-dark">Matriz A:</p>
+                            <div class="d-flex  justify-content-center">
+                                <div class="original-matriz-conexas">
+                                     <!-- contenido -->
+                                </div>
+                            </div>
+                            <div class="d-flex  justify-content-center p-2">
+                             <input type="button" value="1" onclick="LlenarMatriz(1)" class="me-2 btn-secondary">
+                             <input type="button" value="0" onclick="LlenarMatriz(0)"class="me-2 btn-secondary">
+                             <input type="button" value="C" onclick="LlenarMatriz('')" class="me-2 btn-danger">                            
+                             <input type="button" onclick="GenerarMatrizConexas('+')" value="+"class="me-2 btn-dark">
+                             <input type="button" onclick="GenerarMatrizConexas('-')" value="-"class="me-2 btn-success">
+                             <input type="button" class="btn-primary" onclick="ResultadoConexas()" value="Aceptar"class="me-2">
+                            </div>
+                            <hr class="bg-dark">
+                            <p class="text-dark">Resultado</p>
+                            <div class="d-flex  justify-content-center">
+                             <div class="resultado-matriz-conexas mb-5">
+                                  <!-- contenido -->
+                             </div>
+                         </div>
+                        </div>
+ 
+                     </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="hamiltoniano">
+                    <h3 class="text-white bg-dark">Ciclo Hamiltoniano (Camino minimo)</h3>
+                    <div class="contenido-hamiltoniano text-dark">
+                        <div class="botones mb-2 mt-3  w-75 ms-0">
+                            <input type="button" onclick="activarBoton(0)" class="botones-hamiltoniano btn btn-danger border border-dark me-2" value="+Agregar vertice">
+                            <input type="button" onclick="activarBoton(1)" class="botones-hamiltoniano btn btn-secondary border border-dark me-2" value="Conectar vertices">
+                            <input type="button" onclick="activarBoton(2)" class="botones-hamiltoniano btn btn-secondary border border-dark me-2" value="Remover">
+                            <input type="button" onclick="Deshacer()" class="btn btn-warning  me-2" value="Deshacer">
+                            <input type="button" value="Finalizar" class="btn btn-primary">
+                        </div>
+                        <div class="d-flex">
+                            <div class="mt-2 ms-3 me-2 w-75">
+                                <div class="pizarra">
+                                </div>
+                                <p class="cantidad-vertices">Cantidad de vertices: -</p>
+                            </div>
+                            <div class="conexion bg-white mt-2 me-2">
+                                <h5 class="bg-secondary p-1 text-white rounded-3">Agregar arista
+                                </h5>
+                                <div class="">
+                                    <label class="me-2">Peso de la arista: </label>
+                                    <input type="text" class="txtpeso">
+                                </div>
+                                <input type="button" value="Aceptar" class="btn btn-warning mt-2 border border-dark">
+                            </div>
+                        </div>
+                        <h6 class="resultado-hamiltoniano mt-5">Camino minimo: -</h6>
+                    </div>
+                </div>
+                <div class="contenedor rounded desactivado" id="juegos">
+                    <h3 class="text-white bg-dark">Teoria de Juegos (Estretegias puras)</h3>
+                    <div class="contenido-juegos text-dark">
+                        <div class="contenedor-tabla mt-5">
+                            <table class="table table-primary">
+                                <thead>
+                                    <tr class="table-dark cabeza">
+                                        <th scope="col" class="table-secondary"></th>
+                                        <!-- contenido -->
+                                    </tr>
+                                </thead>
+                                <tbody class="cuerpo">
+                                   <!-- contenido -->
+                                </tbody>
+                            </table>
+                            <div class="mt-3">
+                                <input type="button" value="+" onclick="GenerarTabla('+')" class="btn-success me-2 boton-juegos">
+                                <input type="button" value="-" onclick="GenerarTabla('-')" class="btn-warning me-2 boton-juegos">
+                                <input type="button" value="Aceptar" onclick="MostrarResultado()" class="btn-primary">
+                            </div>
+                        </div>
+                        <h6 class="resultado-juegos">Equilibrio de Nash: -</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-2 text-center bg-secondary">
+                ACTIVE
+            </div>
+        </div>
+    </div>
+    <script src="./js/index.js"></script>
+    <script src="./js/juegos.js"></script>
+    <script src="./js/conexas.js"></script>
+    <script src="./js/encriptacion.js"></script>
+    <script src="./js/congruencia.js"></script>
+    <script src="./js/mediana.js"></script>
+    <script src="./js/media.js"></script>
+    <script src="./js/laplaciano.js"></script>
+    <script src="./js/expancion.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/matriz-camino.js"></script>
+</body>
+</html>

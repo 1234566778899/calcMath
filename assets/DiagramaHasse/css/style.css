@@ -1,0 +1,13 @@
+.cj-matriz{
+    width: 210px;
+}
+.cj-input{
+    width: 50px;
+    text-align: center;
+    outline: none;
+    margin: 8px;
+}
+.canvas{
+    border: 1px solid black;
+    display: block;
+}

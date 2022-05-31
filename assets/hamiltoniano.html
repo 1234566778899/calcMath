@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <title>Ciclo Hamiltoniano</title>
+</head>
+<body>
+    <nav>
+        <div class="container-fluid text-center p-3 border border-secondary">
+            <a href="#" class="navbar-brand text-secondary">CICLO HAMILTONIANO (Camino minimo)</a>
+        </div>
+    </nav>
+    <div class="container text-center mt-5">
+        <canvas class="canvas shadow bg-secondary">
+            
+        </canvas>
+        <div>
+            <input type="text" class="cj punto1" placeholder="Vertice 1">
+            <input type="text" class="cj punto2" placeholder="Vertice 2">
+            <input type="text" class="cj peso" placeholder="Peso">
+            <input type="button" value="Agregar arista" class="btn btn-primary boton-linea">
+            <input type="button" value="Finalizar" onclick="caminoMinimo()" class="btn btn-success boton-linea">
+            <input type="button" onclick="limpiar()" class="btn btn-warning" value="Limpiar">
+        </div>
+        <div class="my-4">
+            <h5 class="caminoMinimo">Camino mas corto: -</h5>
+            <h5 class="Recorrido">Longitud: -</h5>
+        </div>
+    </div>
+
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/index.js"></script>
+</body>
+</html>

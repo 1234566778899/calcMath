@@ -1,0 +1,263 @@
+.lista{
+    height: 100%;
+    width: 100%;
+}
+.lista :hover{
+    color: rgb(187, 184, 184);
+    cursor: pointer;
+}
+.contenedor{
+    height: 100%;
+    background-color: rgb(220, 220, 220);
+    overflow-y: scroll;
+}
+.desactivado{
+    display: none;
+}
+.matriz1{
+    width: 240px;
+    border: 1px solid black;
+}
+.matriz2{
+    width: 240px;
+    border: 1px solid black;
+    display: none;
+}
+.cj1{
+    width: 50px;
+    margin: 5px;
+    outline: none;
+    text-align: center;
+}
+.c1{
+    height: 100%;
+}
+.cj2{
+    width: 50px;
+    margin: 5px;
+    outline: none;
+    text-align: center;
+}
+.col{
+    height: 100%;
+}
+.cj-expancion{
+    width: 50px;
+    margin-left: 5px;
+    outline: none;
+    text-align: center;
+}
+.btn-limpiar{
+    width: 50px;
+}
+.canvas-expancion{
+    width: 600px;
+    height: 300px;
+    border: 1px solid black;
+}
+.canvas-ecualizacion{
+    width: 600px;
+    height: 300px;
+    border: 1px solid black;
+}
+.min{
+    width: 50px;
+    outline: none;
+}
+.max{
+    width: 50px;
+    outline:none;
+}
+.cj-ecualizacion{
+    width: 50px;
+    margin-left: 5px;
+    outline: none;
+    text-align: center;
+}
+.original{
+    width: 60%;
+    border: 1px solid black;
+    height: 300px;
+}
+.mascara{
+    width: 30%;
+    height: 200px;
+    background-color: rgb(215, 215, 215);
+}
+.mascara-matriz{
+    width: 100%;
+    height: 80%;
+}
+.cj-mascara-laplaciano{
+   outline: none;
+    text-align: center;
+    width: 60px;
+    margin: 10px;
+    margin-right: 5px;
+}
+.mascara input{
+    width: 50px;
+}
+.original-container{
+    margin: 0 auto;
+    background-color: rgb(215, 215, 215);
+}
+.original-matriz{
+margin: 0 auto;
+
+}
+.cj-original-laplaciano{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.resultado{
+    width: 240px;
+    border: 1px solid black;
+    margin: 0 auto;
+}
+.cj-resultado-laplaciano{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+    color: black;
+}
+.cj-mascara-media{
+    outline: none;
+    text-align: center;
+    width: 60px;
+    margin: 10px;
+    margin-right: 5px;
+}
+.cj-resultado-media{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+    color: black;
+}
+.resultado-media{
+    width: 195px;
+    border: 1px solid black;
+    margin: 0 auto;
+}
+.cj-original-media{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.resultado-mediana{
+    width: 195px;
+    border: 1px solid black;
+    margin: 0 auto;
+}
+.cj-resultado-mediana{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.original{
+    width: 60%;
+    border: 1px solid black;
+    height: 300px;
+}
+.original-mediana{
+    width: 60%;
+    height: 300px;
+    margin: 0 auto;
+    background-color: rgb(195, 195, 195);
+}
+.matriz-mediana{
+    width: 195px;
+    border: 1px solid black;
+}
+.cj-original-mediana{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.contenido-congruencia{
+    width: 60%;
+    height: 300px;
+    margin: 0 auto;
+}
+.cont{
+    width: 50%;
+    height: 100%;
+    font-family: 'Kelly Slab', cursive;
+}
+.caja2{
+    width: 40px;
+    outline: none;
+    text-align: center;
+}
+.titulo{
+    font-size: 30px;
+}
+.boton{
+    width:120px;
+}
+.cont1{
+    background-color: rgb(195, 195, 195);
+}
+.cont2{
+    background-color: rgb(210, 210, 210);
+}
+.contenido-encriptacion{
+    width: 60%;
+    margin: 0 auto;
+    height: 500px;
+    border: 1px solid black;
+}
+.primos{
+    width: 70px;
+    outline: none;
+    text-align: center;
+}
+.lista-encriptacion{
+    background-color: rgb(190, 190, 190);
+    border-radius: 5%;
+    width: 30%;
+    margin: 0 auto;
+    height: 150px;
+    overflow-y: scroll;
+}
+.lista-primos li:hover{
+    background-color: rgb(132, 175, 175);
+    color: white;
+    cursor: pointer;
+}
+.lista-encriptacion::-webkit-scrollbar{
+    width: 5px;
+}
+.lista-encriptacion::-webkit-scrollbar-thumb{
+    background: rgb(11, 94, 215);
+}
+.claves{
+    margin: 0 auto;
+    width: 50%;
+    background-color: rgb(150, 180, 180);
+}
+.original-matriz-conexas{
+    border: 1px solid black;
+}
+.cj-conexas{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.cj-resultado-conexas{
+    outline: none;
+    text-align: center;
+    width: 50px;
+    margin: 5px;
+}
+.resultado-matriz-conexas{
+    border: 1px solid black;
+}

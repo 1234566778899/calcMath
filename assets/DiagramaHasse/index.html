@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Diagrama Hasse</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <div class="d-flex">
+            <img src="matriz.png" alt="matriz" width="50" class="ms-3">
+            <a href="#" class="ms-3 navbar-brand">DIAGRAMA DE HASSE : Matriz de relación</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="mt-4 d-flex flex-column align-content-center">
+                    <div class="cj-matriz mb-2 border border-dark bg-light">
+                    </div>
+                    <div class="botones text-center">
+                        <button class="btn btn-primary" onclick="cambiarTamanio('-')">-</button>
+                        <button class="btn btn-warning" onclick="cambiarTamanio('+')">+</button>
+                        <button class="btn btn-success" onclick="resultado()">ACEPTAR</button>
+                        <button class="btn btn-danger" onclick="limpiar()">C</button>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <button class="btn btn-primary btn-mostrar" onclick="mostrar()">mostrar diagrama</button>
+                    <button class="btn btn-warning" onclick="llenar(1)">1</button>
+                    <button class="btn btn-dark" onclick="llenar(0)">0</button>
+                    <canvas class="canvas mt-2 mb-3"></canvas>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card mt-4">
+                    <div class="card-header notacion">
+                        Resultados
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th scope="col">Reflexiva</th>
+                                <th scope="col">Transitiva</th>
+                                <th scope="col">Antisimetrica</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>                              
+                                <td class="reflex">-</td>
+                                <td class="trans">-</td>
+                                <td class="antis">-</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        Diagrama de Hasse desde la matriz de relación
+                    </div>
+                    <div class="card-body resultado">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>

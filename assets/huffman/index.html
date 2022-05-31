@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Árboles de Huffman</title>
+</head>
+
+<body>
+    <nav>
+        <div class="container-fluid p-4 border border-secondary text-center">
+            <a href="#" class="navbar-brand text-secondary">ÁRBOLES DE HUFFMAN (Comprensión de datos)</a>
+            <p class="cantidad mt-2 float-start">Cantidad: 6</p>
+        </div>
+    </nav>
+    <div class="container-fluid mt-3">
+        <div class="d-flex mb-3">
+            <button class="btn btn-warning" onclick="cambiarTamanio('-')">-</button>
+            <button class="btn btn-primary" onclick="cambiarTamanio('+')">+</button>
+            <div class="d-flex flex-wrap padre-input">
+
+            </div>
+            <button class="btn btn-success" onclick="resultado()">ACEPTAR</button>
+            <button class="btn btn-success btn-mostrar" onclick="mostrarArbol()">Mostrar árbol</button>
+            <button class="btn btn-danger" onclick="limpiarCanvas()">Limpiar</button>
+        </div>
+        <div class="w-100vh cj-canvas">
+            <canvas class="canvas mx-auto"></canvas>
+        </div>
+        <div class="row">
+            <div class="col">
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Carácter</th>
+                            <th scope="col">Frecuencia</th>
+                            <th scope="col">Huffman</th>
+                            <th scope="col">Bits</th>
+                        </tr>
+                    </thead>
+                    <tbody class="cuerpo">
+                        <tr class="fila">
+                            <th scope="row">-</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="fila">
+                            <th scope="row">-</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <div class="ps-5 cj-resultado">
+                    <h6 class="f1">Originalmente: 41x8=326</h6>
+                    <h6 class="f2">Huffman: 120 bits</h6>
+                    <h6 class="f3">(120/326)*100=36.5%</h6>
+                    <h6 class="f4">Se redujo a un 36.5%</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>

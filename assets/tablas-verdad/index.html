@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Tablas de verdad</title>
+</head>
+
+<body>
+    <nav class="navbar border border-secondary">
+        <div class="container-fluid">
+            <a href="#Intrucciones" class="navbar-brand text-secondary ms-3">CALCULADORA ONLINE</a>
+            <div>
+                <a href="#inicio" class="navbar-brand text-secondary">INICIO</a>
+                <a href="#calculadoras" class="navbar-brand text-secondary">CALCULADORAS DE MATEMATICA</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h2 class="text-center my-4">Generador de tablas de verdad - Lógica preposicional, Algebra booleana</h2>
+        <div class="calculadora bg-secondary">
+            <div class="container-pantalla">
+                <input type="text" class="pantalla" value="(~p^q)v(~q^~r)v(r^~s)">
+            </div>
+            <div class="botones d-flex flex-wrap justify-content-center bg-light">
+                <button class="boton btn btn-danger" onclick="limpiar()">AC</button>
+                <button class="boton btn btn-success" onclick="obtenerDatos()">=</button>
+                <button class="boton btn btn-primary" onclick="obtenerTecla('p')">p</button>
+                <button class="boton btn btn-primary" onclick="obtenerTecla('q')">q</button>
+                <button class="boton btn btn-primary" onclick="obtenerTecla('r')">r</button>
+                <button class="boton btn btn-primary" onclick="obtenerTecla('s')">s</button>
+                <button class="boton btn btn-secondary">+</button>
+                <button class="boton btn btn-secondary" onclick="obtenerTecla('~')">~</button>
+                <button class="boton btn btn-secondary" onclick="obtenerTecla('^')">^</button>
+                <button class="boton btn btn-secondary" onclick="obtenerTecla('v')">v</button>
+                <button class="boton btn btn-secondary"onclick="obtenerTecla('(')">(</button>
+                <button class="boton btn btn-secondary" onclick="obtenerTecla(')')">)</button>
+                <button class="boton btn btn-warning">LEFT</button>
+                <button class="boton btn btn-warning">RIGHT</button>             
+                <button class="boton btn btn-success">=</button>             
+            </div>
+        </div>
+        <div class="my-5 text-center contenedor-tabla">
+            <table class="table table-bordered">
+                <thead>
+                  <tr class="tabla-cabecera">
+                   
+                  </tr>
+                </thead>
+                <tbody class="tabla-cuerpo">
+                  
+                </tbody>
+              </table>
+        </div>
+    </div>
+
+
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+.contenedor-tabla{
+    width: 60%;
+    height: 300px;
+    margin: 0 auto;
+}
+.boton-juegos{
+    width: 60px;
+}
+.txtvalor{
+    width: 33px;
+    text-align: center;
+    outline: none;
+}
+.pizarra{
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 1px solid black;
+    margin: 0 auto;
+}
+.botones{
+    margin: 0 auto;
+}
+.vertice-hamiltoniano{
+    position: absolute;  
+    width: 25px;
+    height: 25px; 
+    background-color: darkcyan;
+    border-radius: 50%;
+    border: 1px solid yellow;
+    color: white;
+    cursor: pointer;
+}
+.conexion{
+    left: 28%;
+    top: 19%;
+    width: 150px;
+    height: 150px;
+    border-radius: 4%;
+}
+.txtpeso{
+    width: 50px;
+    text-align: center;
+    outline: none;
+}
+.ancla{
+    text-decoration: none;
+    color: white;
+}
