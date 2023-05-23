@@ -113,8 +113,8 @@ function cambiarTamanio(value) {
     for (let i = 0; i < tam; i++) {
         $('.padre-input').append(`
         <div class="d-flex flex-column cj-input">
-            <input type="text" placeholder="" class="letra">
-             <input type="text" placeholder="" class="valor">
+            <input type="text" placeholder="letra" class="letra">
+             <input type="text" placeholder="numero" class="valor">
         </div>
         `);
     }
