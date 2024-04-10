@@ -13,6 +13,20 @@ const div_juegos = document.querySelector("#juegos")
 
 let arr = [div_matrizCaminos, div_congruencia, div_laplaciano, div_expancion, div_ecualizacion, div_encriptacion, div_media, div_mediana, div_conexas, div_hamiltoniano, div_juegos];
 
+const menuItems = document.querySelectorAll('.lista li');
+function removeActiveClass() {
+    menuItems.forEach(item => {
+        item.classList.remove('activo');
+    });
+}
+
+menuItems.forEach(item => {
+    item.addEventListener('click', function() {
+        removeActiveClass();
+        this.classList.add('activo');
+    });
+});
+
 function activarContenido(value) {
 
     for (let i = 0; i < arr.length; i++) {

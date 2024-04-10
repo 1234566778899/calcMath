@@ -1,9 +1,32 @@
-.canvas{
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+.canvas {
     width: 600px;
     height: 300px;
 }
-.cj{
+
+.cj {
     width: 100px;
     outline: none;
     text-align: center;
+}
+.btn-main{
+    padding: 5px 12px;
+    background-color: #1A73E8;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+.btn-yes{
+    padding: 5px 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    color: #1967D5;
+    font-size: 0.9rem;
+    background-color: #E8F0FE;
 }
