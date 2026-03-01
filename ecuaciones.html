@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuaciones en Diferencia — Matemática Computacional</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a24;
+            --surface-3: #22222e;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --text-muted: #555568;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.15);
+            --accent-glow-strong: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --warning: #fdcb6e;
+            --danger: #ff6b6b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        html { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---- Navbar ---- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            color: var(--text);
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: 700;
+        }
+        .navbar a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s;
+        }
+        .navbar a:hover { color: var(--text); background: var(--surface-2); }
+
+        /* ---- Main Content ---- */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+        .module-header { margin-bottom: 28px; }
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .module-desc {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+        }
+
+        /* ---- Cards ---- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* ---- Tabs ---- */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .tab:hover { color: var(--text); background: var(--surface-3); }
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow-strong);
+        }
+
+        /* ---- Input fields ---- */
+        .input-field {
+            height: 40px;
+            padding: 0 12px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+            transition: all 0.15s;
+        }
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .input-sm { width: 64px; text-align: center; }
+        .input-md { width: 100px; text-align: center; }
+        .input-lg { width: 100%; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 18px;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: #5b4bd6; box-shadow: 0 2px 12px var(--accent-glow-strong); }
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+        .btn-danger {
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        .btn-danger:hover { background: rgba(255, 107, 107, 0.2); }
+        .btn-success {
+            background: rgba(0, 206, 201, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(0, 206, 201, 0.2);
+        }
+        .btn-success:hover { background: rgba(0, 206, 201, 0.2); }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        /* ---- Equation builder ---- */
+        .equation-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+        .equation-row .label-text {
+            font-weight: 500;
+        }
+        .coeff-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .coeff-group .sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            vertical-align: sub;
+        }
+
+        /* ---- Conditions ---- */
+        .conditions-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .condition-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* ---- Result box ---- */
+        .result-box {
+            padding: 16px 20px;
+            background: var(--accent-glow);
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            border-radius: var(--radius-sm);
+            font-family: var(--mono);
+            font-size: 0.88rem;
+            color: var(--accent-light);
+            font-weight: 600;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        /* ---- Steps display ---- */
+        .steps-display {
+            padding: 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            line-height: 2;
+            color: var(--text-dim);
+            overflow-x: auto;
+        }
+        .steps-display .step {
+            margin-bottom: 4px;
+            padding: 4px 0;
+        }
+        .steps-display .step-header {
+            color: var(--accent-light);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+        }
+        .steps-display .step-header:first-child { margin-top: 0; }
+        .steps-display .highlight {
+            color: var(--success);
+            font-weight: 600;
+        }
+        .steps-display .warn {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        /* ---- G(n) selector ---- */
+        .gn-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .gn-option {
+            padding: 8px 16px;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text-dim);
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .gn-option:hover { border-color: var(--border-hover); color: var(--text); }
+        .gn-option.active {
+            background: var(--accent-glow);
+            border-color: rgba(108, 92, 231, 0.3);
+            color: var(--accent-light);
+        }
+
+        /* ---- Non-homogeneous g(n) input ---- */
+        .gn-inputs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .spacer { height: 16px; }
+        .spacer-sm { height: 10px; }
+
+        /* ---- Info box ---- */
+        .info-box {
+            padding: 14px 18px;
+            background: rgba(0, 206, 201, 0.08);
+            border: 1px solid rgba(0, 206, 201, 0.15);
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            color: var(--success);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* ---- Select ---- */
+        .select-field {
+            height: 40px;
+            padding: 0 12px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .select-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        /* ---- Examples dropdown ---- */
+        .examples-dropdown {
+            position: relative;
+        }
+        .examples-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            z-index: 50;
+            max-height: 260px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        .examples-list.open { display: block; }
+        .example-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            transition: all 0.15s;
+        }
+        .example-item:hover {
+            background: var(--accent-glow);
+            color: var(--accent-light);
+        }
+        .examples-list::-webkit-scrollbar { width: 4px; }
+        .examples-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        @media (max-width: 640px) {
+            .main-content { padding: 20px 16px 60px; }
+            .equation-row { font-size: 0.8rem; }
+            .tabs { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-brand">
+        <div class="brand-icon">Δ</div>
+        ECUACIONES EN DIFERENCIA
+    </div>
+    <a href="./index.html">← Volver</a>
+</nav>
+
+<main class="main-content">
+    <div class="module-header">
+        <div class="module-title">Ecuaciones en Diferencia Lineales</div>
+        <div class="module-desc">Resuelve ecuaciones en diferencia lineales con coeficientes constantes, homogéneas y no homogéneas, con resolución paso a paso.</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('homogeneous')">Homogénea</button>
+        <button class="tab" onclick="switchTab('nonhomogeneous')">No Homogénea</button>
+    </div>
+
+    <!-- ========== HOMOGENEOUS TAB ========== -->
+    <div id="tab-homogeneous">
+        <div class="card">
+            <div class="card-title">Orden de la ecuación</div>
+            <div class="btn-group" style="margin-bottom: 16px;">
+                <button class="btn btn-secondary" id="hom-ord-1" onclick="setHomOrder(1)">Orden 1</button>
+                <button class="btn btn-primary" id="hom-ord-2" onclick="setHomOrder(2)">Orden 2</button>
+                <button class="btn btn-secondary" id="hom-ord-3" onclick="setHomOrder(3)">Orden 3</button>
+            </div>
+
+            <div class="card-title" style="margin-top:16px;">Ecuación</div>
+            <div class="equation-row" id="hom-equation"></div>
+
+            <div class="spacer"></div>
+            <div class="card-title">Condiciones iniciales</div>
+            <div class="conditions-row" id="hom-conditions"></div>
+
+            <div class="spacer"></div>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="clearHom()">Limpiar</button>
+                <button class="btn btn-primary" onclick="solveHomogeneous()">Resolver</button>
+                <div class="examples-dropdown" style="position:relative;">
+                    <button class="btn btn-success" onclick="toggleExamples('hom')">Ejemplos ▾</button>
+                    <div class="examples-list" id="hom-examples">
+                        <div class="example-item" onclick="loadHomExample(0)">f(n+2) − 4f(n+1) + 3f(n) = 0; f(0)=0, f(1)=1</div>
+                        <div class="example-item" onclick="loadHomExample(1)">f(n+2) − f(n+1) + f(n) = 0; f(0)=0, f(1)=1</div>
+                        <div class="example-item" onclick="loadHomExample(2)">f(n+3) − 7f(n+2) + 15f(n+1) − 9f(n) = 0; f(0)=−1, f(1)=2, f(2)=17</div>
+                        <div class="example-item" onclick="loadHomExample(3)">f(n+2) − 7f(n+1) + 12f(n) = 0; f(0)=0, f(1)=2</div>
+                        <div class="example-item" onclick="loadHomExample(4)">f(n+2) − f(n+1) − 2f(n) = 0; f(0)=2, f(1)=4</div>
+                        <div class="example-item" onclick="loadHomExample(5)">f(n+2) − 4f(n+1) + 4f(n) = 0; f(0)=1, f(1)=3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="hom-result-card" style="display:none;">
+            <div class="card-title">Resultado</div>
+            <div class="result-box" id="hom-result"></div>
+        </div>
+
+        <div class="card" id="hom-steps-card" style="display:none;">
+            <div class="card-title">Resolución paso a paso</div>
+            <div class="steps-display" id="hom-steps"></div>
+        </div>
+    </div>
+
+    <!-- ========== NON-HOMOGENEOUS TAB ========== -->
+    <div id="tab-nonhomogeneous" style="display:none;">
+        <div class="card">
+            <div class="card-title">Orden de la ecuación</div>
+            <div class="btn-group" style="margin-bottom: 16px;">
+                <button class="btn btn-secondary" id="nh-ord-1" onclick="setNHOrder(1)">Orden 1</button>
+                <button class="btn btn-primary" id="nh-ord-2" onclick="setNHOrder(2)">Orden 2</button>
+                <button class="btn btn-secondary" id="nh-ord-3" onclick="setNHOrder(3)">Orden 3</button>
+            </div>
+
+            <div class="card-title" style="margin-top:16px;">Parte homogénea (coeficientes)</div>
+            <div class="equation-row" id="nh-equation"></div>
+
+            <div class="spacer-sm"></div>
+            <div class="card-title">Tipo de g(n)</div>
+            <div class="gn-selector">
+                <div class="gn-option active" data-type="poly" onclick="setGnType('poly')">Polinomio</div>
+                <div class="gn-option" data-type="exp" onclick="setGnType('exp')">Exponencial aⁿ</div>
+                <div class="gn-option" data-type="exppoly" onclick="setGnType('exppoly')">aⁿ·p(n)</div>
+                <div class="gn-option" data-type="const" onclick="setGnType('const')">Constante</div>
+            </div>
+
+            <div id="gn-input-area"></div>
+
+            <div class="spacer"></div>
+            <div class="card-title">Condiciones iniciales (opcional)</div>
+            <div class="conditions-row" id="nh-conditions"></div>
+
+            <div class="spacer"></div>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="clearNH()">Limpiar</button>
+                <button class="btn btn-primary" onclick="solveNonHomogeneous()">Resolver</button>
+                <div class="examples-dropdown" style="position:relative;">
+                    <button class="btn btn-success" onclick="toggleExamples('nh')">Ejemplos ▾</button>
+                    <div class="examples-list" id="nh-examples">
+                        <div class="example-item" onclick="loadNHExample(0)">f(n+2) − f(n+1) + f(n) = n</div>
+                        <div class="example-item" onclick="loadNHExample(1)">f(n+2) − 2f(n+1) + f(n) = n+1</div>
+                        <div class="example-item" onclick="loadNHExample(2)">y(n+2) + 2y(n+1) + y(n) = 3ⁿ</div>
+                        <div class="example-item" onclick="loadNHExample(3)">f(n+1) − 2f(n) = 2ⁿ; f(0)=−1</div>
+                        <div class="example-item" onclick="loadNHExample(4)">f(n+1) − 2f(n) = n; f(0)=0</div>
+                        <div class="example-item" onclick="loadNHExample(5)">x(n+3) − 3x(n+2) + 4x(n) = 4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="nh-result-card" style="display:none;">
+            <div class="card-title">Resultado</div>
+            <div class="result-box" id="nh-result"></div>
+        </div>
+
+        <div class="card" id="nh-steps-card" style="display:none;">
+            <div class="card-title">Resolución paso a paso</div>
+            <div class="steps-display" id="nh-steps"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+// ===========================
+// GLOBAL STATE
+// ===========================
+let homOrder = 2;
+let nhOrder = 2;
+let gnType = 'poly';
+
+// ===========================
+// TAB SWITCHING
+// ===========================
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-homogeneous').style.display = tab === 'homogeneous' ? 'block' : 'none';
+    document.getElementById('tab-nonhomogeneous').style.display = tab === 'nonhomogeneous' ? 'block' : 'none';
+}
+
+// ===========================
+// EXAMPLES TOGGLE
+// ===========================
+function toggleExamples(prefix) {
+    const el = document.getElementById(prefix + '-examples');
+    el.classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.examples-dropdown')) {
+        document.querySelectorAll('.examples-list').forEach(l => l.classList.remove('open'));
+    }
+});
+
+// ===========================
+// HOMOGENEOUS UI
+// ===========================
+function setHomOrder(ord) {
+    homOrder = ord;
+    [1,2,3].forEach(i => {
+        document.getElementById('hom-ord-' + i).className = i === ord ? 'btn btn-primary' : 'btn btn-secondary';
+    });
+    buildHomEquation();
+    buildHomConditions();
+    hideHomResults();
+}
+
+function buildHomEquation() {
+    const el = document.getElementById('hom-equation');
+    let html = '';
+    for (let i = 0; i <= homOrder; i++) {
+        const shift = homOrder - i;
+        if (i > 0) html += ' <span>+</span> ';
+        html += `<div class="coeff-group"><input type="text" class="input-field input-sm" id="hom-a${i}" placeholder="a${i}">`;
+        if (shift === 0) html += `<span>f(n)</span>`;
+        else if (shift === 1) html += `<span>f(n+1)</span>`;
+        else html += `<span>f(n+${shift})</span>`;
+        html += `</div>`;
+    }
+    html += ' <span>= 0</span>';
+    el.innerHTML = html;
+}
+
+function buildHomConditions() {
+    const el = document.getElementById('hom-conditions');
+    let html = '';
+    for (let i = 0; i < homOrder; i++) {
+        html += `<div class="condition-item">f(${i}) = <input type="text" class="input-field input-sm" id="hom-c${i}" placeholder="c${i}"></div>`;
+    }
+    el.innerHTML = html;
+}
+
+function hideHomResults() {
+    document.getElementById('hom-result-card').style.display = 'none';
+    document.getElementById('hom-steps-card').style.display = 'none';
+}
+
+function clearHom() {
+    buildHomEquation();
+    buildHomConditions();
+    hideHomResults();
+}
+
+// ===========================
+// NON-HOMOGENEOUS UI
+// ===========================
+function setNHOrder(ord) {
+    nhOrder = ord;
+    [1,2,3].forEach(i => {
+        document.getElementById('nh-ord-' + i).className = i === ord ? 'btn btn-primary' : 'btn btn-secondary';
+    });
+    buildNHEquation();
+    buildNHConditions();
+    buildGnInput();
+    hideNHResults();
+}
+
+function buildNHEquation() {
+    const el = document.getElementById('nh-equation');
+    let html = '';
+    for (let i = 0; i <= nhOrder; i++) {
+        const shift = nhOrder - i;
+        if (i > 0) html += ' <span>+</span> ';
+        html += `<div class="coeff-group"><input type="text" class="input-field input-sm" id="nh-a${i}" placeholder="a${i}">`;
+        if (shift === 0) html += `<span>f(n)</span>`;
+        else if (shift === 1) html += `<span>f(n+1)</span>`;
+        else html += `<span>f(n+${shift})</span>`;
+        html += `</div>`;
+    }
+    html += ' <span>= g(n)</span>';
+    el.innerHTML = html;
+}
+
+function buildNHConditions() {
+    const el = document.getElementById('nh-conditions');
+    let html = '';
+    for (let i = 0; i < nhOrder; i++) {
+        html += `<div class="condition-item">f(${i}) = <input type="text" class="input-field input-sm" id="nh-c${i}" placeholder=""></div>`;
+    }
+    el.innerHTML = html;
+}
+
+function setGnType(type) {
+    gnType = type;
+    document.querySelectorAll('.gn-option').forEach(o => o.classList.toggle('active', o.dataset.type === type));
+    buildGnInput();
+}
+
+function buildGnInput() {
+    const el = document.getElementById('gn-input-area');
+    if (gnType === 'const') {
+        el.innerHTML = `<div class="gn-inputs">g(n) = <input type="text" class="input-field input-sm" id="gn-const" placeholder="k"></div>`;
+    } else if (gnType === 'poly') {
+        el.innerHTML = `
+            <div class="info-box">Ingrese los coeficientes del polinomio g(n) = c₀ + c₁n + c₂n² + ...</div>
+            <div class="gn-inputs">
+                g(n) = <input type="text" class="input-field input-sm" id="gn-p0" placeholder="c₀">
+                + <input type="text" class="input-field input-sm" id="gn-p1" placeholder="c₁"> n
+                + <input type="text" class="input-field input-sm" id="gn-p2" placeholder="c₂"> n²
+            </div>`;
+    } else if (gnType === 'exp') {
+        el.innerHTML = `<div class="gn-inputs">g(n) = <input type="text" class="input-field input-sm" id="gn-base" placeholder="a"> <sup>n</sup></div>`;
+    } else if (gnType === 'exppoly') {
+        el.innerHTML = `
+            <div class="info-box">g(n) = aⁿ · p(n) donde p(n) es un polinomio</div>
+            <div class="gn-inputs">
+                g(n) = <input type="text" class="input-field input-sm" id="gn-ebase" placeholder="a"> <sup>n</sup>
+                · ( <input type="text" class="input-field input-sm" id="gn-ep0" placeholder="c₀">
+                + <input type="text" class="input-field input-sm" id="gn-ep1" placeholder="c₁"> n )
+            </div>`;
+    }
+}
+
+function hideNHResults() {
+    document.getElementById('nh-result-card').style.display = 'none';
+    document.getElementById('nh-steps-card').style.display = 'none';
+}
+
+function clearNH() {
+    buildNHEquation();
+    buildNHConditions();
+    buildGnInput();
+    hideNHResults();
+}
+
+// ===========================
+// MATH UTILITIES
+// ===========================
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+
+function frac(num, den) {
+    if (den === 0) return '∞';
+    if (num === 0) return '0';
+    const sign = (num * den < 0) ? -1 : 1;
+    num = Math.abs(num); den = Math.abs(den);
+    const g = gcd(num, den);
+    num = sign * num / g; den = den / g;
+    if (den === 1) return `${num}`;
+    return `${num}/${den}`;
+}
+
+function fracVal(num, den) {
+    if (den === 0) return Infinity;
+    return num / den;
+}
+
+// Solve quadratic ar² + br + c = 0, returns {roots, types}
+function solveQuadratic(a, b, c) {
+    const disc = b * b - 4 * a * c;
+    if (Math.abs(disc) < 1e-10) {
+        const r = -b / (2 * a);
+        return { roots: [r, r], multiplicities: [2], type: 'repeated' };
+    } else if (disc > 0) {
+        const r1 = (-b + Math.sqrt(disc)) / (2 * a);
+        const r2 = (-b - Math.sqrt(disc)) / (2 * a);
+        return { roots: [r1, r2], multiplicities: [1, 1], type: 'real' };
+    } else {
+        const real = -b / (2 * a);
+        const imag = Math.sqrt(-disc) / (2 * a);
+        return { roots: [{ re: real, im: imag }], type: 'complex', modulus: Math.sqrt(real*real + imag*imag), theta: Math.atan2(imag, real) };
+    }
+}
+
+// Solve cubic r³ + br² + cr + d = 0 using numeric methods (Newton's)
+function solveCubic(a, b, c, d) {
+    // Normalize: divide by a
+    const B = b/a, C = c/a, D = d/a;
+    // Find one real root via Newton's method
+    function f(x) { return x*x*x + B*x*x + C*x + D; }
+    function fp(x) { return 3*x*x + 2*B*x + C; }
+
+    // Try rational root theorem first: test ±factors of D
+    let r1 = null;
+    const candidates = [];
+    if (Math.abs(D) > 1e-10) {
+        const absD = Math.round(Math.abs(D));
+        for (let i = 1; i <= absD && i <= 20; i++) {
+            if (absD % i === 0) { candidates.push(i, -i, absD/i, -(absD/i)); }
+        }
+        candidates.push(0);
+        for (const cand of candidates) {
+            if (Math.abs(f(cand)) < 1e-8) { r1 = cand; break; }
+        }
+    } else {
+        r1 = 0;
+    }
+
+    if (r1 === null) {
+        // Newton's method
+        let x = 0;
+        for (let i = 0; i < 100; i++) {
+            const fv = f(x), fpv = fp(x);
+            if (Math.abs(fpv) < 1e-14) { x += 0.1; continue; }
+            x = x - fv / fpv;
+            if (Math.abs(f(x)) < 1e-10) break;
+        }
+        r1 = x;
+    }
+
+    // Factor out (r - r1): r³ + Br² + Cr + D = (r - r1)(r² + Er + F)
+    const E = B + r1;
+    const F = C + r1 * E;
+
+    const quad = solveQuadratic(1, E, F);
+    const allRoots = [r1];
+    const allMult = [1];
+
+    if (quad.type === 'real') {
+        for (const root of quad.roots) {
+            // Check if same as r1
+            const idx = allRoots.findIndex(r => Math.abs(r - root) < 1e-8);
+            if (idx >= 0) allMult[idx]++;
+            else { allRoots.push(root); allMult.push(1); }
+        }
+        return { roots: allRoots, multiplicities: allMult, type: 'real' };
+    } else if (quad.type === 'repeated') {
+        const root = quad.roots[0];
+        const idx = allRoots.findIndex(r => Math.abs(r - root) < 1e-8);
+        if (idx >= 0) allMult[idx] += 2;
+        else { allRoots.push(root); allMult.push(2); }
+        return { roots: allRoots, multiplicities: allMult, type: 'real' };
+    } else {
+        // Complex roots
+        return { roots: allRoots, multiplicities: allMult, type: 'mixed_complex', complex: quad };
+    }
+}
+
+// Solve linear system 2x2
+function solve2x2(a11, a12, b1, a21, a22, b2) {
+    const det = a11*a22 - a12*a21;
+    if (Math.abs(det) < 1e-12) return null;
+    return [(b1*a22 - b2*a12)/det, (a11*b2 - a21*b1)/det];
+}
+
+// Solve linear system 3x3
+function solve3x3(m, b) {
+    const det = m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])
+              - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])
+              + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+    if (Math.abs(det) < 1e-12) return null;
+    const x0 = (b[0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(b[1]*m[2][2]-m[1][2]*b[2]) + m[0][2]*(b[1]*m[2][1]-m[1][1]*b[2])) / det;
+    const x1 = (m[0][0]*(b[1]*m[2][2]-m[1][2]*b[2]) - b[0]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*b[2]-b[1]*m[2][0])) / det;
+    const x2 = (m[0][0]*(m[1][1]*b[2]-b[1]*m[2][1]) - m[0][1]*(m[1][0]*b[2]-b[1]*m[2][0]) + b[0]*(m[1][0]*m[2][1]-m[1][1]*m[2][0])) / det;
+    return [x0, x1, x2];
+}
+
+function formatNum(x) {
+    if (Math.abs(x - Math.round(x)) < 1e-8) return `${Math.round(x)}`;
+    // Try fractions
+    for (let d = 1; d <= 100; d++) {
+        const n = Math.round(x * d);
+        if (Math.abs(n/d - x) < 1e-8) return frac(n, d);
+    }
+    return x.toFixed(4);
+}
+
+function formatCoeff(c, variable, first) {
+    if (Math.abs(c) < 1e-10) return '';
+    const absC = Math.abs(c);
+    const sign = c >= 0 ? (first ? '' : ' + ') : (first ? '−' : ' − ');
+    const coefStr = Math.abs(absC - 1) < 1e-10 && variable ? '' : formatNum(absC);
+    return sign + coefStr + variable;
+}
+
+// ===========================
+// SOLVE HOMOGENEOUS
+// ===========================
+function solveHomogeneous() {
+    const coeffs = [];
+    for (let i = 0; i <= homOrder; i++) {
+        const v = parseFloat(document.getElementById('hom-a' + i).value);
+        if (isNaN(v)) { alert('Ingrese todos los coeficientes'); return; }
+        coeffs.push(v);
+    }
+
+    const conditions = [];
+    let hasConditions = true;
+    for (let i = 0; i < homOrder; i++) {
+        const v = document.getElementById('hom-c' + i).value.trim();
+        if (v === '') { hasConditions = false; break; }
+        conditions.push(parseFloat(v));
+    }
+
+    let steps = [];
+    const a = coeffs;
+
+    // Step 1: Show the equation
+    steps.push({ type: 'header', text: 'Ecuación original' });
+    let eqStr = '';
+    for (let i = 0; i <= homOrder; i++) {
+        const shift = homOrder - i;
+        const coef = a[i];
+        const term = shift === 0 ? 'f(n)' : `f(n+${shift})`;
+        eqStr += formatCoeff(coef, term, i === 0);
+    }
+    eqStr += ' = 0';
+    steps.push({ type: 'step', text: eqStr });
+
+    // Step 2: Characteristic equation
+    steps.push({ type: 'header', text: 'Ecuación característica' });
+    let charStr = '';
+    for (let i = 0; i <= homOrder; i++) {
+        const power = homOrder - i;
+        const term = power === 0 ? '' : (power === 1 ? 'r' : `r^${power}`);
+        charStr += formatCoeff(a[i], term, i === 0);
+    }
+    charStr += ' = 0';
+    steps.push({ type: 'step', text: charStr });
+
+    // Step 3: Solve characteristic equation
+    steps.push({ type: 'header', text: 'Raíces de la ecuación característica' });
+
+    let rootInfo;
+    let generalSolution = '';
+    let solFunctions = []; // Functions for evaluating f(n) given constants
+
+    if (homOrder === 1) {
+        const r = -a[1] / a[0];
+        rootInfo = { roots: [r], multiplicities: [1], type: 'real' };
+        steps.push({ type: 'step', text: `r = ${formatNum(r)}` });
+        steps.push({ type: 'header', text: 'Solución general' });
+        generalSolution = `f(n) = C₁·(${formatNum(r)})ⁿ`;
+        steps.push({ type: 'step', text: generalSolution });
+        solFunctions = [(n, C) => C[0] * Math.pow(r, n)];
+
+    } else if (homOrder === 2) {
+        const result = solveQuadratic(a[0], a[1], a[2]);
+
+        if (result.type === 'real') {
+            const [r1, r2] = result.roots;
+            steps.push({ type: 'step', text: `r₁ = ${formatNum(r1)};  r₂ = ${formatNum(r2)}` });
+            steps.push({ type: 'step', text: 'Raíces simples distintas' });
+            steps.push({ type: 'header', text: 'Solución general' });
+            generalSolution = `f(n) = C₁·(${formatNum(r1)})ⁿ + C₂·(${formatNum(r2)})ⁿ`;
+            steps.push({ type: 'step', text: generalSolution });
+            solFunctions = [(n, C) => C[0]*Math.pow(r1,n) + C[1]*Math.pow(r2,n)];
+            rootInfo = result;
+
+        } else if (result.type === 'repeated') {
+            const r = result.roots[0];
+            steps.push({ type: 'step', text: `r₁ = r₂ = ${formatNum(r)}  (multiplicidad 2)` });
+            steps.push({ type: 'header', text: 'Solución general' });
+            generalSolution = `f(n) = C₁·(${formatNum(r)})ⁿ + C₂·n·(${formatNum(r)})ⁿ`;
+            steps.push({ type: 'step', text: generalSolution });
+            solFunctions = [(n, C) => C[0]*Math.pow(r,n) + C[1]*n*Math.pow(r,n)];
+            rootInfo = result;
+
+        } else {
+            const { modulus, theta } = result;
+            const re = result.roots[0].re, im = result.roots[0].im;
+            steps.push({ type: 'step', text: `r = ${formatNum(re)} ± ${formatNum(im)}i` });
+            steps.push({ type: 'step', text: `|r| = ${formatNum(modulus)};  θ = ${formatNum(theta)} rad` });
+
+            let thetaStr = '';
+            // Common angle detection
+            const piRatio = theta / Math.PI;
+            const commonAngles = [[1/6,'π/6'],[1/4,'π/4'],[1/3,'π/3'],[1/2,'π/2'],[2/3,'2π/3'],[3/4,'3π/4'],[5/6,'5π/6']];
+            for (const [val, str] of commonAngles) {
+                if (Math.abs(piRatio - val) < 1e-8) { thetaStr = str; break; }
+            }
+            if (!thetaStr) thetaStr = formatNum(theta);
+
+            steps.push({ type: 'header', text: 'Solución general (raíces complejas)' });
+            generalSolution = `f(n) = (${formatNum(modulus)})ⁿ · [C₁·cos(${thetaStr}·n) + C₂·sin(${thetaStr}·n)]`;
+            steps.push({ type: 'step', text: generalSolution });
+            solFunctions = [(n, C) => Math.pow(modulus,n)*(C[0]*Math.cos(theta*n) + C[1]*Math.sin(theta*n))];
+            rootInfo = result;
+        }
+
+    } else if (homOrder === 3) {
+        const result = solveCubic(a[0], a[1], a[2], a[3]);
+
+        if (result.type === 'real') {
+            let rootStr = '';
+            for (let i = 0; i < result.roots.length; i++) {
+                rootStr += `r${i===0?'':i} = ${formatNum(result.roots[i])}`;
+                if (result.multiplicities[i] > 1) rootStr += ` (multiplicidad ${result.multiplicities[i]})`;
+                if (i < result.roots.length - 1) rootStr += ';  ';
+            }
+            steps.push({ type: 'step', text: rootStr });
+
+            steps.push({ type: 'header', text: 'Solución general' });
+            let sol = 'f(n) = ';
+            let termIdx = 1;
+            const terms = [];
+            for (let i = 0; i < result.roots.length; i++) {
+                const r = result.roots[i];
+                const m = result.multiplicities[i];
+                for (let j = 0; j < m; j++) {
+                    const rStr = Math.abs(r-1) < 1e-10 ? '' : `·(${formatNum(r)})ⁿ`;
+                    const nPow = j === 0 ? '' : (j === 1 ? '·n' : `·n^${j}`);
+                    terms.push(`C${termIdx}${nPow}${rStr || (j===0 ? (Math.abs(r-1)<1e-10?'':'') : '')}`);
+                    if (Math.abs(r-1) < 1e-10 && j === 0) terms[terms.length-1] = `C${termIdx}`;
+                    termIdx++;
+                }
+            }
+            sol += terms.join(' + ');
+            generalSolution = sol;
+            steps.push({ type: 'step', text: generalSolution });
+            rootInfo = result;
+        } else {
+            // Mixed: one real + complex pair
+            const r1 = result.roots[0];
+            steps.push({ type: 'step', text: `r₁ = ${formatNum(r1)}` });
+            const { modulus, theta } = result.complex;
+            const re = result.complex.roots[0].re, im = result.complex.roots[0].im;
+            steps.push({ type: 'step', text: `r₂,₃ = ${formatNum(re)} ± ${formatNum(im)}i` });
+            steps.push({ type: 'step', text: `|r| = ${formatNum(modulus)};  θ = ${formatNum(theta)} rad` });
+
+            steps.push({ type: 'header', text: 'Solución general' });
+            const r1Str = Math.abs(r1-1)<1e-10 ? 'C₁' : `C₁·(${formatNum(r1)})ⁿ`;
+            generalSolution = `f(n) = ${r1Str} + (${formatNum(modulus)})ⁿ·[C₂·cos(${formatNum(theta)}n) + C₃·sin(${formatNum(theta)}n)]`;
+            steps.push({ type: 'step', text: generalSolution });
+            rootInfo = result;
+        }
+    }
+
+    // Step 4: Apply initial conditions
+    if (hasConditions && conditions.length === homOrder) {
+        steps.push({ type: 'header', text: 'Aplicar condiciones iniciales' });
+
+        if (homOrder === 1) {
+            const r = -a[1]/a[0];
+            const c1 = conditions[0] / Math.pow(r, 0);
+            steps.push({ type: 'step', text: `f(0) = C₁ = ${formatNum(conditions[0])}` });
+            steps.push({ type: 'step', text: `C₁ = ${formatNum(c1)}` });
+
+            steps.push({ type: 'header', text: 'Solución particular' });
+            const finalSol = `f(n) = ${formatNum(c1)}·(${formatNum(r)})ⁿ`;
+            steps.push({ type: 'highlight', text: finalSol });
+            generalSolution = finalSol;
+
+        } else if (homOrder === 2) {
+            if (rootInfo.type === 'real') {
+                const [r1, r2] = rootInfo.roots;
+                // f(0) = C1 + C2 = conditions[0]
+                // f(1) = C1*r1 + C2*r2 = conditions[1]
+                steps.push({ type: 'step', text: `f(0) = C₁·(${formatNum(r1)})⁰ + C₂·(${formatNum(r2)})⁰ = C₁ + C₂ = ${formatNum(conditions[0])}` });
+                steps.push({ type: 'step', text: `f(1) = C₁·(${formatNum(r1)}) + C₂·(${formatNum(r2)}) = ${formatNum(conditions[1])}` });
+                const sol = solve2x2(1, 1, conditions[0], r1, r2, conditions[1]);
+                if (sol) {
+                    steps.push({ type: 'step', text: `C₁ = ${formatNum(sol[0])};  C₂ = ${formatNum(sol[1])}` });
+                    steps.push({ type: 'header', text: 'Solución particular' });
+                    const final_ = `f(n) = ${formatNum(sol[0])}·(${formatNum(r1)})ⁿ + ${formatNum(sol[1])}·(${formatNum(r2)})ⁿ`;
+                    steps.push({ type: 'highlight', text: final_ });
+                    generalSolution = final_;
+                }
+            } else if (rootInfo.type === 'repeated') {
+                const r = rootInfo.roots[0];
+                steps.push({ type: 'step', text: `f(0) = C₁ = ${formatNum(conditions[0])}` });
+                steps.push({ type: 'step', text: `f(1) = C₁·(${formatNum(r)}) + C₂·(${formatNum(r)}) = ${formatNum(conditions[1])}` });
+                const c1 = conditions[0];
+                const c2 = (conditions[1] - c1 * r) / r;
+                steps.push({ type: 'step', text: `C₁ = ${formatNum(c1)};  C₂ = ${formatNum(c2)}` });
+                steps.push({ type: 'header', text: 'Solución particular' });
+                const final_ = `f(n) = ${formatNum(c1)}·(${formatNum(r)})ⁿ + ${formatNum(c2)}·n·(${formatNum(r)})ⁿ`;
+                steps.push({ type: 'highlight', text: final_ });
+                generalSolution = final_;
+            } else {
+                // Complex
+                const { modulus, theta } = rootInfo;
+                steps.push({ type: 'step', text: `f(0) = C₁·cos(0) + C₂·sin(0) = C₁ = ${formatNum(conditions[0])}` });
+                const c1 = conditions[0];
+                const f1Val = Math.pow(modulus, 1) * (c1 * Math.cos(theta) + 0);
+                const sinTheta = Math.sin(theta);
+                const c2 = (conditions[1] - Math.pow(modulus, 1) * c1 * Math.cos(theta)) / (Math.pow(modulus, 1) * sinTheta);
+                steps.push({ type: 'step', text: `f(1) = (${formatNum(modulus)})·[C₁·cos(θ) + C₂·sin(θ)] = ${formatNum(conditions[1])}` });
+                steps.push({ type: 'step', text: `C₁ = ${formatNum(c1)};  C₂ = ${formatNum(c2)}` });
+                steps.push({ type: 'header', text: 'Solución particular' });
+
+                let thetaStr = formatNum(theta);
+                const piRatio = theta / Math.PI;
+                const commonAngles = [[1/6,'π/6'],[1/4,'π/4'],[1/3,'π/3'],[1/2,'π/2'],[2/3,'2π/3'],[3/4,'3π/4']];
+                for (const [val, str] of commonAngles) {
+                    if (Math.abs(piRatio - val) < 1e-8) { thetaStr = str; break; }
+                }
+
+                const final_ = `f(n) = (${formatNum(modulus)})ⁿ · [${formatNum(c1)}·cos(${thetaStr}·n) + ${formatNum(c2)}·sin(${thetaStr}·n)]`;
+                steps.push({ type: 'highlight', text: final_ });
+                generalSolution = final_;
+            }
+
+        } else if (homOrder === 3 && rootInfo.type === 'real') {
+            // Build 3x3 system for n=0,1,2
+            const roots = rootInfo.roots;
+            const mults = rootInfo.multiplicities;
+
+            // Build basis functions
+            const basis = [];
+            for (let i = 0; i < roots.length; i++) {
+                for (let j = 0; j < mults[i]; j++) {
+                    basis.push({ root: roots[i], power: j });
+                }
+            }
+
+            // Evaluate at n=0,1,2
+            const evalBasis = (b, n) => Math.pow(n, b.power) * Math.pow(b.root, n);
+            const mat = [];
+            for (let n = 0; n < 3; n++) {
+                mat.push(basis.map(b => evalBasis(b, n)));
+            }
+
+            for (let n = 0; n < 3; n++) {
+                let line = `f(${n}) = `;
+                line += basis.map((b, i) => {
+                    const val = evalBasis(b, n);
+                    return `${formatNum(val)}·C${i+1}`;
+                }).join(' + ');
+                line += ` = ${formatNum(conditions[n])}`;
+                steps.push({ type: 'step', text: line });
+            }
+
+            const sol = solve3x3(mat, conditions);
+            if (sol) {
+                steps.push({ type: 'step', text: `C₁ = ${formatNum(sol[0])};  C₂ = ${formatNum(sol[1])};  C₃ = ${formatNum(sol[2])}` });
+                steps.push({ type: 'header', text: 'Solución particular' });
+                let final_ = 'f(n) = ';
+                const terms = [];
+                for (let i = 0; i < basis.length; i++) {
+                    if (Math.abs(sol[i]) < 1e-10) continue;
+                    const b = basis[i];
+                    let t = formatNum(sol[i]);
+                    if (b.power > 0) t += (b.power === 1 ? '·n' : `·n^${b.power}`);
+                    if (Math.abs(b.root - 1) > 1e-10) t += `·(${formatNum(b.root)})ⁿ`;
+                    terms.push(t);
+                }
+                final_ += terms.join(' + ') || '0';
+                steps.push({ type: 'highlight', text: final_ });
+                generalSolution = final_;
+            }
+        }
+    }
+
+    // Display
+    document.getElementById('hom-result-card').style.display = 'block';
+    document.getElementById('hom-result').textContent = generalSolution;
+    document.getElementById('hom-steps-card').style.display = 'block';
+    renderSteps('hom-steps', steps);
+}
+
+function renderSteps(containerId, steps) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    for (const s of steps) {
+        const div = document.createElement('div');
+        if (s.type === 'header') {
+            div.className = 'step-header';
+            div.textContent = s.text;
+        } else if (s.type === 'highlight') {
+            div.className = 'step highlight';
+            div.textContent = s.text;
+        } else if (s.type === 'warn') {
+            div.className = 'step warn';
+            div.textContent = s.text;
+        } else {
+            div.className = 'step';
+            div.textContent = s.text;
+        }
+        el.appendChild(div);
+    }
+}
+
+// ===========================
+// SOLVE NON-HOMOGENEOUS
+// ===========================
+function solveNonHomogeneous() {
+    const coeffs = [];
+    for (let i = 0; i <= nhOrder; i++) {
+        const v = parseFloat(document.getElementById('nh-a' + i).value);
+        if (isNaN(v)) { alert('Ingrese todos los coeficientes'); return; }
+        coeffs.push(v);
+    }
+
+    const conditions = [];
+    let hasConditions = true;
+    for (let i = 0; i < nhOrder; i++) {
+        const v = document.getElementById('nh-c' + i).value.trim();
+        if (v === '') { hasConditions = false; break; }
+        conditions.push(parseFloat(v));
+    }
+
+    let steps = [];
+    const a = coeffs;
+
+    // Step 1: Show equation
+    steps.push({ type: 'header', text: 'Ecuación original' });
+    let eqStr = '';
+    for (let i = 0; i <= nhOrder; i++) {
+        const shift = nhOrder - i;
+        const coef = a[i];
+        const term = shift === 0 ? 'f(n)' : `f(n+${shift})`;
+        eqStr += formatCoeff(coef, term, i === 0);
+    }
+    eqStr += ' = g(n)';
+    steps.push({ type: 'step', text: eqStr });
+
+    // Step 2: Parse g(n)
+    steps.push({ type: 'header', text: 'Identificar g(n)' });
+    let gnDesc = '';
+    let gnEval; // function of n
+
+    if (gnType === 'const') {
+        const k = parseFloat(document.getElementById('gn-const').value) || 0;
+        gnDesc = `g(n) = ${formatNum(k)}`;
+        gnEval = (n) => k;
+    } else if (gnType === 'poly') {
+        const p0 = parseFloat(document.getElementById('gn-p0').value) || 0;
+        const p1 = parseFloat(document.getElementById('gn-p1').value) || 0;
+        const p2 = parseFloat(document.getElementById('gn-p2').value) || 0;
+        gnDesc = `g(n) = ${formatNum(p0)} + ${formatNum(p1)}·n + ${formatNum(p2)}·n²`;
+        gnEval = (n) => p0 + p1*n + p2*n*n;
+    } else if (gnType === 'exp') {
+        const base = parseFloat(document.getElementById('gn-base').value) || 0;
+        gnDesc = `g(n) = (${formatNum(base)})ⁿ`;
+        gnEval = (n) => Math.pow(base, n);
+    } else if (gnType === 'exppoly') {
+        const base = parseFloat(document.getElementById('gn-ebase').value) || 0;
+        const p0 = parseFloat(document.getElementById('gn-ep0').value) || 0;
+        const p1 = parseFloat(document.getElementById('gn-ep1').value) || 0;
+        gnDesc = `g(n) = (${formatNum(base)})ⁿ · (${formatNum(p0)} + ${formatNum(p1)}·n)`;
+        gnEval = (n) => Math.pow(base, n) * (p0 + p1*n);
+    }
+    steps.push({ type: 'step', text: gnDesc });
+
+    // Step 3: Solve homogeneous part
+    steps.push({ type: 'header', text: 'Resolver ecuación homogénea asociada' });
+    let charStr = '';
+    for (let i = 0; i <= nhOrder; i++) {
+        const power = nhOrder - i;
+        const term = power === 0 ? '' : (power === 1 ? 'r' : `r^${power}`);
+        charStr += formatCoeff(a[i], term, i === 0);
+    }
+    charStr += ' = 0';
+    steps.push({ type: 'step', text: 'Ecuación característica: ' + charStr });
+
+    let rootInfo, homSolStr = '';
+
+    if (nhOrder === 1) {
+        const r = -a[1]/a[0];
+        rootInfo = { roots: [r], multiplicities: [1], type: 'real' };
+        steps.push({ type: 'step', text: `r = ${formatNum(r)}` });
+        homSolStr = `yₕ(n) = C₁·(${formatNum(r)})ⁿ`;
+    } else if (nhOrder === 2) {
+        rootInfo = solveQuadratic(a[0], a[1], a[2]);
+        if (rootInfo.type === 'real') {
+            steps.push({ type: 'step', text: `r₁ = ${formatNum(rootInfo.roots[0])};  r₂ = ${formatNum(rootInfo.roots[1])}` });
+            homSolStr = `yₕ(n) = C₁·(${formatNum(rootInfo.roots[0])})ⁿ + C₂·(${formatNum(rootInfo.roots[1])})ⁿ`;
+        } else if (rootInfo.type === 'repeated') {
+            steps.push({ type: 'step', text: `r₁ = r₂ = ${formatNum(rootInfo.roots[0])}  (multiplicidad 2)` });
+            homSolStr = `yₕ(n) = C₁·(${formatNum(rootInfo.roots[0])})ⁿ + C₂·n·(${formatNum(rootInfo.roots[0])})ⁿ`;
+        } else {
+            const { modulus, theta } = rootInfo;
+            steps.push({ type: 'step', text: `r = ${formatNum(rootInfo.roots[0].re)} ± ${formatNum(rootInfo.roots[0].im)}i` });
+            let thetaStr = formatNum(theta);
+            const piRatio = theta / Math.PI;
+            const commonAngles = [[1/6,'π/6'],[1/4,'π/4'],[1/3,'π/3'],[1/2,'π/2'],[2/3,'2π/3'],[3/4,'3π/4']];
+            for (const [val, str] of commonAngles) {
+                if (Math.abs(piRatio - val) < 1e-8) { thetaStr = str; break; }
+            }
+            homSolStr = `yₕ(n) = (${formatNum(modulus)})ⁿ·[C₁·cos(${thetaStr}·n) + C₂·sin(${thetaStr}·n)]`;
+        }
+    } else if (nhOrder === 3) {
+        rootInfo = solveCubic(a[0], a[1], a[2], a[3]);
+        if (rootInfo.type === 'real') {
+            let rStr = rootInfo.roots.map((r, i) => `r${i+1}=${formatNum(r)}${rootInfo.multiplicities[i]>1?' (mult. '+rootInfo.multiplicities[i]+')':''}`).join('; ');
+            steps.push({ type: 'step', text: rStr });
+            let terms = [];
+            let idx = 1;
+            for (let i = 0; i < rootInfo.roots.length; i++) {
+                for (let j = 0; j < rootInfo.multiplicities[i]; j++) {
+                    const rStr2 = Math.abs(rootInfo.roots[i]-1)<1e-10 && j===0 ? `C${idx}` :
+                        (j===0 ? `C${idx}·(${formatNum(rootInfo.roots[i])})ⁿ` : `C${idx}·n${j>1?'^'+j:''}·(${formatNum(rootInfo.roots[i])})ⁿ`);
+                    terms.push(rStr2);
+                    idx++;
+                }
+            }
+            homSolStr = `yₕ(n) = ${terms.join(' + ')}`;
+        } else {
+            let rStr = `r₁ = ${formatNum(rootInfo.roots[0])}`;
+            steps.push({ type: 'step', text: rStr });
+            const { modulus, theta } = rootInfo.complex;
+            steps.push({ type: 'step', text: `r₂,₃ = ${formatNum(rootInfo.complex.roots[0].re)} ± ${formatNum(rootInfo.complex.roots[0].im)}i` });
+            const r1Str = Math.abs(rootInfo.roots[0]-1)<1e-10 ? 'C₁' : `C₁·(${formatNum(rootInfo.roots[0])})ⁿ`;
+            homSolStr = `yₕ(n) = ${r1Str} + (${formatNum(modulus)})ⁿ·[C₂·cos(${formatNum(theta)}n) + C₃·sin(${formatNum(theta)}n)]`;
+        }
+    }
+    steps.push({ type: 'step', text: homSolStr });
+
+    // Step 4: Find particular solution via numerical brute force
+    steps.push({ type: 'header', text: 'Buscar solución particular z(n)' });
+
+    // We'll use a numerical approach: guess z(n) form based on gnType, then solve
+    // by substituting into the equation
+    let particularSolStr = '';
+    let zEval = null;
+
+    // Evaluate LHS: sum of a[i] * f(n + order - i)
+    function evalLHS(fn, n) {
+        let sum = 0;
+        for (let i = 0; i <= nhOrder; i++) {
+            sum += a[i] * fn(n + nhOrder - i);
+        }
+        return sum;
+    }
+
+    // Check if a value is a root of the characteristic equation
+    function isCharRoot(val) {
+        if (!rootInfo) return false;
+        if (rootInfo.type === 'complex') return false;
+        const roots = rootInfo.roots || [];
+        for (const r of roots) {
+            if (typeof r === 'number' && Math.abs(r - val) < 1e-8) return true;
+        }
+        if (rootInfo.type === 'mixed_complex' && rootInfo.roots) {
+            for (const r of rootInfo.roots) {
+                if (typeof r === 'number' && Math.abs(r - val) < 1e-8) return true;
+            }
+        }
+        return false;
+    }
+
+    function rootMultiplicity(val) {
+        if (!rootInfo || !rootInfo.roots) return 0;
+        for (let i = 0; i < rootInfo.roots.length; i++) {
+            if (typeof rootInfo.roots[i] === 'number' && Math.abs(rootInfo.roots[i] - val) < 1e-8) {
+                return rootInfo.multiplicities ? rootInfo.multiplicities[i] : 1;
+            }
+        }
+        return 0;
+    }
+
+    if (gnType === 'const') {
+        const k = parseFloat(document.getElementById('gn-const').value) || 0;
+        // Try z(n) = A, then z(n) = A*n, then z(n) = A*n², etc.
+        let m = 0;
+        if (isCharRoot(1)) {
+            m = rootMultiplicity(1);
+            steps.push({ type: 'step', text: `r=1 es raíz de la ecuación característica con multiplicidad ${m}` });
+            steps.push({ type: 'step', text: `Se prueba z(n) = A·n^${m}` });
+        } else {
+            steps.push({ type: 'step', text: 'Se prueba z(n) = A (constante)' });
+        }
+
+        // z(n) = A * n^m
+        // Sub into equation: sum a[i] * A * (n + order - i)^m = k
+        // At n = 0: sum a[i] * A * (order - i)^m = k
+        let sumCoeff = 0;
+        for (let i = 0; i <= nhOrder; i++) {
+            sumCoeff += a[i] * Math.pow(nhOrder - i, m);
+        }
+        if (Math.abs(sumCoeff) > 1e-10) {
+            const A = k / sumCoeff;
+            const mStr = m === 0 ? '' : (m === 1 ? 'n' : `n^${m}`);
+            particularSolStr = `z(n) = ${formatNum(A)}${mStr ? '·' + mStr : ''}`;
+            zEval = (n) => A * Math.pow(n, m);
+
+            steps.push({ type: 'step', text: `Sustituyendo: ${formatNum(sumCoeff)}·A = ${formatNum(k)}` });
+            steps.push({ type: 'step', text: `A = ${formatNum(A)}` });
+        } else {
+            m++;
+            // Retry with higher power
+            sumCoeff = 0;
+            for (let i = 0; i <= nhOrder; i++) {
+                sumCoeff += a[i] * Math.pow(nhOrder - i, m);
+            }
+            const A = k / sumCoeff;
+            particularSolStr = `z(n) = ${formatNum(A)}·n^${m}`;
+            zEval = (n) => A * Math.pow(n, m);
+            steps.push({ type: 'step', text: `Se incrementa potencia. z(n) = A·n^${m}` });
+            steps.push({ type: 'step', text: `A = ${formatNum(A)}` });
+        }
+        steps.push({ type: 'highlight', text: particularSolStr });
+
+    } else if (gnType === 'poly') {
+        const p0 = parseFloat(document.getElementById('gn-p0').value) || 0;
+        const p1 = parseFloat(document.getElementById('gn-p1').value) || 0;
+        const p2 = parseFloat(document.getElementById('gn-p2').value) || 0;
+        const polyDeg = (Math.abs(p2) > 1e-10) ? 2 : (Math.abs(p1) > 1e-10) ? 1 : 0;
+
+        let m = 0;
+        if (isCharRoot(1)) {
+            m = rootMultiplicity(1);
+            steps.push({ type: 'step', text: `r=1 es raíz con multiplicidad ${m}, se multiplica por n^${m}` });
+        }
+
+        if (polyDeg <= 1) {
+            steps.push({ type: 'step', text: `Se prueba z(n) = n^${m}·(An + B)` });
+            // z(n) = n^m * (A*n + B)
+            // Need to find A, B by substituting n=0,1,2,...
+            // Use 2 equations from n values
+            function zTrial(A, B, n) { return Math.pow(n, m) * (A * n + B); }
+            // Evaluate LHS at n=0 and n=1
+            // LHS(n) = sum a[i] * z(n + order - i)
+            function lhs(A, B, n) {
+                let s = 0;
+                for (let i = 0; i <= nhOrder; i++) {
+                    s += a[i] * zTrial(A, B, n + nhOrder - i);
+                }
+                return s;
+            }
+            // We need: lhs(A,B,n) = p0 + p1*n for all n
+            // Evaluate at n=0 and n=1
+            // lhs is linear in A,B, so: lhs(1,0,n) * A + lhs(0,1,n) * B = g(n)
+            const lhsA0 = lhs(1, 0, 0), lhsB0 = lhs(0, 1, 0);
+            const lhsA1 = lhs(1, 0, 1), lhsB1 = lhs(0, 1, 1);
+            const rhs0 = p0 + p1 * 0;
+            const rhs1 = p0 + p1 * 1;
+            const sol = solve2x2(lhsA0, lhsB0, rhs0, lhsA1, lhsB1, rhs1);
+            if (sol) {
+                const [A, B] = sol;
+                const mStr = m > 0 ? `n^${m}·` : '';
+                particularSolStr = `z(n) = ${mStr}(${formatNum(A)}·n + ${formatNum(B)})`;
+                zEval = (n) => Math.pow(n, m) * (A * n + B);
+                steps.push({ type: 'step', text: `A = ${formatNum(A)};  B = ${formatNum(B)}` });
+            }
+        } else {
+            steps.push({ type: 'step', text: `Se prueba z(n) = n^${m}·(An² + Bn + C)` });
+            function zTrial2(A, B, C, n) { return Math.pow(n, m) * (A*n*n + B*n + C); }
+            function lhs2(A, B, C, n) {
+                let s = 0;
+                for (let i = 0; i <= nhOrder; i++) {
+                    s += a[i] * zTrial2(A, B, C, n + nhOrder - i);
+                }
+                return s;
+            }
+            const mat = [
+                [lhs2(1,0,0,0), lhs2(0,1,0,0), lhs2(0,0,1,0)],
+                [lhs2(1,0,0,1), lhs2(0,1,0,1), lhs2(0,0,1,1)],
+                [lhs2(1,0,0,2), lhs2(0,1,0,2), lhs2(0,0,1,2)]
+            ];
+            const rhs = [p0, p0+p1+p2, p0+2*p1+4*p2];
+            const sol = solve3x3(mat, rhs);
+            if (sol) {
+                const [A, B, C] = sol;
+                const mStr = m > 0 ? `n^${m}·` : '';
+                particularSolStr = `z(n) = ${mStr}(${formatNum(A)}n² + ${formatNum(B)}n + ${formatNum(C)})`;
+                zEval = (n) => Math.pow(n, m) * (A*n*n + B*n + C);
+                steps.push({ type: 'step', text: `A = ${formatNum(A)};  B = ${formatNum(B)};  C = ${formatNum(C)}` });
+            }
+        }
+        if (particularSolStr) steps.push({ type: 'highlight', text: particularSolStr });
+
+    } else if (gnType === 'exp') {
+        const base = parseFloat(document.getElementById('gn-base').value) || 0;
+        let m = 0;
+        if (isCharRoot(base)) {
+            m = rootMultiplicity(base);
+            steps.push({ type: 'step', text: `r=${formatNum(base)} es raíz con multiplicidad ${m}` });
+        }
+        steps.push({ type: 'step', text: `Se prueba z(n) = k·n^${m}·(${formatNum(base)})ⁿ` });
+
+        // z(n) = k * n^m * base^n
+        // LHS = sum a[i] * k * (n+order-i)^m * base^(n+order-i) = base^n
+        // At a specific n: sum a[i] * k * (n+order-i)^m * base^(order-i) = 1
+        // Use n=0:
+        let sumCoeff = 0;
+        for (let i = 0; i <= nhOrder; i++) {
+            sumCoeff += a[i] * Math.pow(nhOrder - i, m) * Math.pow(base, nhOrder - i);
+        }
+
+        if (Math.abs(sumCoeff) < 1e-10) {
+            m++;
+            sumCoeff = 0;
+            for (let i = 0; i <= nhOrder; i++) {
+                sumCoeff += a[i] * Math.pow(nhOrder - i, m) * Math.pow(base, nhOrder - i);
+            }
+            steps.push({ type: 'step', text: `Se incrementa m a ${m}` });
+        }
+
+        const k = 1.0 / sumCoeff;
+        particularSolStr = `z(n) = ${formatNum(k)}·n^${m}·(${formatNum(base)})ⁿ`;
+        if (m === 0) particularSolStr = `z(n) = ${formatNum(k)}·(${formatNum(base)})ⁿ`;
+        if (m === 1) particularSolStr = `z(n) = ${formatNum(k)}·n·(${formatNum(base)})ⁿ`;
+        zEval = (n) => k * Math.pow(n, m) * Math.pow(base, n);
+        steps.push({ type: 'step', text: `Sustituyendo: ${formatNum(sumCoeff)}·k = 1` });
+        steps.push({ type: 'step', text: `k = ${formatNum(k)}` });
+        steps.push({ type: 'highlight', text: particularSolStr });
+
+    } else if (gnType === 'exppoly') {
+        const base = parseFloat(document.getElementById('gn-ebase').value) || 0;
+        const ep0 = parseFloat(document.getElementById('gn-ep0').value) || 0;
+        const ep1 = parseFloat(document.getElementById('gn-ep1').value) || 0;
+
+        let m = 0;
+        if (isCharRoot(base)) {
+            m = rootMultiplicity(base);
+            steps.push({ type: 'step', text: `r=${formatNum(base)} es raíz con multiplicidad ${m}` });
+        }
+        steps.push({ type: 'step', text: `Se prueba z(n) = n^${m}·(An + B)·(${formatNum(base)})ⁿ` });
+
+        function zT(A, B, n) { return Math.pow(n, m) * (A*n + B) * Math.pow(base, n); }
+        function lhsT(A, B, n) {
+            let s = 0;
+            for (let i = 0; i <= nhOrder; i++) {
+                s += a[i] * zT(A, B, n + nhOrder - i);
+            }
+            return s;
+        }
+        const lhsA0 = lhsT(1, 0, 0), lhsB0 = lhsT(0, 1, 0);
+        const lhsA1 = lhsT(1, 0, 1), lhsB1 = lhsT(0, 1, 1);
+        const gn0 = Math.pow(base, 0) * (ep0 + ep1 * 0);
+        const gn1 = Math.pow(base, 1) * (ep0 + ep1 * 1);
+        const sol = solve2x2(lhsA0, lhsB0, gn0, lhsA1, lhsB1, gn1);
+        if (sol) {
+            const [A, B] = sol;
+            const mStr = m > 0 ? `n^${m}·` : '';
+            particularSolStr = `z(n) = ${mStr}(${formatNum(A)}n + ${formatNum(B)})·(${formatNum(base)})ⁿ`;
+            zEval = (n) => Math.pow(n, m) * (A*n + B) * Math.pow(base, n);
+            steps.push({ type: 'step', text: `A = ${formatNum(A)};  B = ${formatNum(B)}` });
+            steps.push({ type: 'highlight', text: particularSolStr });
+        }
+    }
+
+    // Step 5: General solution
+    steps.push({ type: 'header', text: 'Solución general de la ecuación no homogénea' });
+    const generalSol = `f(n) = ${homSolStr.replace('yₕ(n) = ', '')} + ${particularSolStr.replace('z(n) = ', '')}`;
+    steps.push({ type: 'step', text: 'f(n) = yₕ(n) + z(n)' });
+    steps.push({ type: 'highlight', text: generalSol });
+
+    // Step 6: Apply initial conditions if given
+    if (hasConditions && conditions.length === nhOrder && zEval) {
+        steps.push({ type: 'header', text: 'Aplicar condiciones iniciales' });
+
+        if (nhOrder === 1) {
+            const r = -a[1]/a[0];
+            // f(n) = C1*r^n + z(n)
+            // f(0) = C1 + z(0) = conditions[0]
+            const c1 = conditions[0] - zEval(0);
+            steps.push({ type: 'step', text: `f(0) = C₁ + z(0) = C₁ + ${formatNum(zEval(0))} = ${formatNum(conditions[0])}` });
+            steps.push({ type: 'step', text: `C₁ = ${formatNum(c1)}` });
+            const finalSol = `f(n) = ${formatNum(c1)}·(${formatNum(r)})ⁿ + ${particularSolStr.replace('z(n) = ', '')}`;
+            steps.push({ type: 'header', text: 'Solución particular' });
+            steps.push({ type: 'highlight', text: finalSol });
+        } else if (nhOrder === 2) {
+            // Need to solve 2x2 system
+            // This depends on the root type
+            steps.push({ type: 'step', text: 'Se resuelve el sistema de ecuaciones con las condiciones iniciales' });
+
+            // Build numeric system
+            if (rootInfo.type === 'real') {
+                const [r1, r2] = rootInfo.roots;
+                const a11 = Math.pow(r1, 0), a12 = Math.pow(r2, 0);
+                const a21 = Math.pow(r1, 1), a22 = Math.pow(r2, 1);
+                const b1 = conditions[0] - zEval(0);
+                const b2 = conditions[1] - zEval(1);
+                steps.push({ type: 'step', text: `C₁ + C₂ = ${formatNum(conditions[0])} − ${formatNum(zEval(0))} = ${formatNum(b1)}` });
+                steps.push({ type: 'step', text: `${formatNum(r1)}·C₁ + ${formatNum(r2)}·C₂ = ${formatNum(conditions[1])} − ${formatNum(zEval(1))} = ${formatNum(b2)}` });
+                const sol = solve2x2(a11, a12, b1, a21, a22, b2);
+                if (sol) {
+                    steps.push({ type: 'step', text: `C₁ = ${formatNum(sol[0])};  C₂ = ${formatNum(sol[1])}` });
+                }
+            } else if (rootInfo.type === 'repeated') {
+                const r = rootInfo.roots[0];
+                const b1 = conditions[0] - zEval(0);
+                const b2 = conditions[1] - zEval(1);
+                steps.push({ type: 'step', text: `C₁ = ${formatNum(b1)}` });
+                const c2 = (b2 - b1 * r) / r;
+                steps.push({ type: 'step', text: `C₂ = ${formatNum(c2)}` });
+            } else {
+                steps.push({ type: 'step', text: 'Se resuelven C₁ y C₂ numéricamente con las condiciones iniciales' });
+            }
+        }
+    }
+
+    // Display
+    document.getElementById('nh-result-card').style.display = 'block';
+    document.getElementById('nh-result').textContent = generalSol;
+    document.getElementById('nh-steps-card').style.display = 'block';
+    renderSteps('nh-steps', steps);
+}
+
+// ===========================
+// LOAD EXAMPLES
+// ===========================
+const homExamples = [
+    { order: 2, coeffs: [1, -4, 3], conditions: [0, 1] },
+    { order: 2, coeffs: [1, -1, 1], conditions: [0, 1] },
+    { order: 3, coeffs: [1, -7, 15, -9], conditions: [-1, 2, 17] },
+    { order: 2, coeffs: [1, -7, 12], conditions: [0, 2] },
+    { order: 2, coeffs: [1, -1, -2], conditions: [2, 4] },
+    { order: 2, coeffs: [1, -4, 4], conditions: [1, 3] },
+];
+
+function loadHomExample(idx) {
+    const ex = homExamples[idx];
+    setHomOrder(ex.order);
+    for (let i = 0; i <= ex.order; i++) {
+        document.getElementById('hom-a' + i).value = ex.coeffs[i];
+    }
+    for (let i = 0; i < ex.order; i++) {
+        document.getElementById('hom-c' + i).value = ex.conditions[i];
+    }
+    document.getElementById('hom-examples').classList.remove('open');
+}
+
+const nhExamples = [
+    { order: 2, coeffs: [1, -1, 1], type: 'poly', gn: { p0: 0, p1: 1, p2: 0 }, conditions: [] },
+    { order: 2, coeffs: [1, -2, 1], type: 'poly', gn: { p0: 1, p1: 1, p2: 0 }, conditions: [] },
+    { order: 2, coeffs: [1, 2, 1], type: 'exp', gn: { base: 3 }, conditions: [] },
+    { order: 1, coeffs: [1, -2], type: 'exp', gn: { base: 2 }, conditions: [-1] },
+    { order: 1, coeffs: [1, -2], type: 'poly', gn: { p0: 0, p1: 1, p2: 0 }, conditions: [0] },
+    { order: 3, coeffs: [1, -3, 0, 4], type: 'const', gn: { const: 4 }, conditions: [] },
+];
+
+function loadNHExample(idx) {
+    const ex = nhExamples[idx];
+    setNHOrder(ex.order);
+    for (let i = 0; i <= ex.order; i++) {
+        document.getElementById('nh-a' + i).value = ex.coeffs[i];
+    }
+    setGnType(ex.type);
+
+    setTimeout(() => {
+        if (ex.type === 'const') {
+            const el = document.getElementById('gn-const');
+            if (el) el.value = ex.gn.const;
+        } else if (ex.type === 'poly') {
+            const el0 = document.getElementById('gn-p0');
+            const el1 = document.getElementById('gn-p1');
+            const el2 = document.getElementById('gn-p2');
+            if (el0) el0.value = ex.gn.p0 || 0;
+            if (el1) el1.value = ex.gn.p1 || 0;
+            if (el2) el2.value = ex.gn.p2 || 0;
+        } else if (ex.type === 'exp') {
+            const el = document.getElementById('gn-base');
+            if (el) el.value = ex.gn.base;
+        }
+    }, 50);
+
+    for (let i = 0; i < ex.order; i++) {
+        const el = document.getElementById('nh-c' + i);
+        if (el && ex.conditions[i] !== undefined) el.value = ex.conditions[i];
+    }
+    document.getElementById('nh-examples').classList.remove('open');
+}
+
+// ===========================
+// INIT
+// ===========================
+buildHomEquation();
+buildHomConditions();
+buildNHEquation();
+buildNHConditions();
+buildGnInput();
+</script>
+</body>
+</html>
