@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ford-Fulkerson — Flujo Máximo</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#0a0a0f;--surface:#13131a;--surface-2:#1a1a24;--surface-3:#22222e;
+            --border:#2a2a3a;--border-hover:#3a3a50;--text:#e8e8f0;--text-dim:#8888a0;--text-muted:#555568;
+            --accent:#6c5ce7;--accent-light:#a29bfe;--accent-glow:rgba(108,92,231,.15);--accent-glow-strong:rgba(108,92,231,.3);
+            --success:#00cec9;--success-glow:rgba(0,206,201,.15);--warning:#fdcb6e;--danger:#ff6b6b;
+            --radius:12px;--radius-sm:8px;--radius-xs:6px;
+            --font:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+        }
+        html,body{height:100%}
+        body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+
+        /* Navbar */
+        .navbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+        .navbar-brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:.95rem;color:var(--text);text-decoration:none}
+        .brand-icon{width:32px;height:32px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:700}
+        .nav-right{display:flex;align-items:center;gap:12px}
+        .badge{padding:4px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-family:var(--mono);font-size:.75rem;color:var(--text-dim)}
+        .back-link{color:var(--text-dim);text-decoration:none;font-size:.85rem;font-weight:500;padding:6px 14px;border-radius:var(--radius-xs);transition:all .2s}
+        .back-link:hover{color:var(--text);background:var(--surface-2)}
+
+        /* Layout */
+        .main{flex:1;display:flex;overflow:hidden}
+        .panel-left{width:320px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+        .panel-left::-webkit-scrollbar{width:5px}
+        .panel-left::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+        .panel-right{flex:1;display:flex;flex-direction:column;min-width:0}
+
+        /* Cards */
+        .card{padding:16px 18px;border-bottom:1px solid var(--border)}
+        .card-title{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:10px}
+
+        /* Buttons */
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;font-family:var(--font);font-size:.8rem;font-weight:600;border:none;border-radius:var(--radius-xs);cursor:pointer;transition:all .15s;user-select:none}
+        .btn-primary{background:var(--accent);color:#fff}
+        .btn-primary:hover{background:#5b4bd6;box-shadow:0 2px 12px var(--accent-glow-strong)}
+        .btn-secondary{background:var(--surface-3);color:var(--text-dim);border:1px solid var(--border)}
+        .btn-secondary:hover{background:var(--border);color:var(--text)}
+        .btn-danger{background:rgba(255,107,107,.12);color:var(--danger);border:1px solid rgba(255,107,107,.2)}
+        .btn-danger:hover{background:rgba(255,107,107,.2)}
+        .btn-success{background:rgba(0,206,201,.12);color:var(--success);border:1px solid rgba(0,206,201,.2)}
+        .btn-success:hover{background:rgba(0,206,201,.2)}
+        .btn-warning{background:rgba(253,203,110,.12);color:var(--warning);border:1px solid rgba(253,203,110,.2)}
+        .btn-warning:hover{background:rgba(253,203,110,.2)}
+        .btn.active{outline:2px solid var(--accent);outline-offset:1px}
+        .btn:disabled{opacity:.4;cursor:not-allowed}
+        .btn-group{display:flex;gap:6px;flex-wrap:wrap}
+
+        .input-field{height:34px;padding:0 10px;font-family:var(--mono);font-size:.8rem;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);outline:none;width:100%;transition:border-color .15s}
+        .input-field:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+        .input-row{display:flex;gap:6px;align-items:center}
+        .input-row label{font-size:.75rem;color:var(--text-dim);font-weight:600;white-space:nowrap;min-width:50px}
+        .input-row .input-field{flex:1}
+
+        /* Select */
+        select.input-field{appearance:none;cursor:pointer;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888a0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+
+        /* Mode indicator */
+        .mode-bar{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--surface-2);border-bottom:1px solid var(--border);flex-shrink:0}
+        .mode-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        .mode-dot.green{background:var(--success)}
+        .mode-dot.yellow{background:var(--warning)}
+        .mode-text{font-size:.8rem;color:var(--text-dim)}
+        .mode-text strong{color:var(--text);font-weight:600}
+
+        /* Canvas */
+        .canvas-wrapper{flex:1;position:relative;overflow:hidden;background:var(--surface)}
+        .canvas-wrapper canvas{display:block;width:100%;height:100%}
+        .canvas-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);padding:5px 14px;background:rgba(10,10,15,.85);border:1px solid var(--border);border-radius:20px;font-size:.72rem;color:var(--text-dim);pointer-events:none}
+
+        /* Steps panel */
+        .steps-panel{height:260px;border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--surface)}
+        .steps-header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+        .steps-header .card-title{margin:0}
+        .steps-scroll{flex:1;overflow-y:auto;padding:10px 18px}
+        .steps-scroll::-webkit-scrollbar{width:5px}
+        .steps-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+        .step-item{padding:10px 14px;margin-bottom:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.78rem;line-height:1.5;transition:all .2s}
+        .step-item.active{border-color:var(--accent);background:var(--accent-glow)}
+        .step-item.done{opacity:.65}
+        .step-num{font-family:var(--mono);font-weight:700;color:var(--accent-light);margin-right:6px}
+        .step-path{font-family:var(--mono);color:var(--success);font-weight:600}
+        .step-delta{font-family:var(--mono);color:var(--warning);font-weight:600}
+        .step-flow{font-family:var(--mono);color:var(--accent-light);font-weight:700}
+
+        /* Result bar */
+        .result-bar{padding:14px 18px;background:var(--success-glow);border-top:1px solid rgba(0,206,201,.2);flex-shrink:0;display:none;align-items:center;gap:16px}
+        .result-bar.visible{display:flex}
+        .result-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
+        .result-value{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--success)}
+        .result-sep{width:1px;height:28px;background:var(--border)}
+
+        /* Edge list */
+        .edge-item{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;font-family:var(--mono);font-size:.72rem;border-radius:4px;margin-bottom:2px}
+        .edge-item:hover{background:var(--surface-3)}
+        .edge-nodes{color:var(--text-dim)}.edge-cap{color:var(--warning)}.edge-flow{color:var(--success)}
+
+        /* Examples dropdown */
+        .examples-list{display:flex;flex-direction:column;gap:4px}
+        .example-btn{text-align:left;padding:8px 10px;font-size:.78rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text-dim);cursor:pointer;transition:all .15s;font-family:var(--font)}
+        .example-btn:hover{background:var(--surface-3);color:var(--text);border-color:var(--border-hover)}
+        .example-btn .ex-title{font-weight:600;color:var(--text);display:block;margin-bottom:2px}
+        .example-btn .ex-desc{font-size:.7rem}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="navbar-brand" onclick="history.back();return false">
+        <div class="brand-icon">↗</div>
+        Ford-Fulkerson — Flujo Máximo
+    </a>
+    <div class="nav-right">
+        <span class="badge" id="b-nodes">Nodos: 0</span>
+        <span class="badge" id="b-edges">Arcos: 0</span>
+        <a href="#" class="back-link" onclick="history.back();return false">← Volver</a>
+    </div>
+</nav>
+
+<div class="main">
+    <!-- Left panel -->
+    <div class="panel-left">
+        <!-- Mode -->
+        <div class="card">
+            <div class="card-title">Modo</div>
+            <div class="btn-group">
+                <button class="btn btn-primary active" id="btn-m-node" onclick="setMode('node')">+ Nodo</button>
+                <button class="btn btn-secondary" id="btn-m-edge" onclick="setMode('edge')">↔ Arco</button>
+                <button class="btn btn-secondary" id="btn-m-move" onclick="setMode('move')">✋ Mover</button>
+            </div>
+        </div>
+
+        <!-- Source / Sink -->
+        <div class="card">
+            <div class="card-title">Fuente y Sumidero</div>
+            <div class="input-row" style="margin-bottom:6px">
+                <label>Fuente</label>
+                <select class="input-field" id="sel-source"></select>
+            </div>
+            <div class="input-row">
+                <label>Sumidero</label>
+                <select class="input-field" id="sel-sink"></select>
+            </div>
+        </div>
+
+        <!-- Manual edge -->
+        <div class="card" id="edge-card">
+            <div class="card-title">Agregar Arco Manual</div>
+            <div class="input-row" style="margin-bottom:6px">
+                <label>Desde</label>
+                <select class="input-field" id="edge-from"></select>
+            </div>
+            <div class="input-row" style="margin-bottom:6px">
+                <label>Hasta</label>
+                <select class="input-field" id="edge-to"></select>
+            </div>
+            <div class="input-row" style="margin-bottom:8px">
+                <label>Cap.</label>
+                <input type="number" class="input-field" id="edge-cap" min="1" value="1">
+            </div>
+            <button class="btn btn-primary" onclick="addEdgeManual()" style="width:100%">Agregar arco</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-title">Acciones</div>
+            <div class="btn-group" style="flex-direction:column">
+                <button class="btn btn-success" onclick="runFordFulkerson()" style="width:100%" id="btn-run">▶ Ejecutar Ford-Fulkerson</button>
+                <button class="btn btn-warning" onclick="stepNext()" style="width:100%" id="btn-step" disabled>Siguiente paso →</button>
+                <button class="btn btn-secondary" onclick="resetFlow()" style="width:100%">↺ Reiniciar flujo</button>
+                <button class="btn btn-danger" onclick="clearAll()" style="width:100%">Limpiar todo</button>
+            </div>
+        </div>
+
+        <!-- Edges list -->
+        <div class="card" style="flex:1;min-height:0;overflow-y:auto">
+            <div class="card-title">Arcos <span id="edge-list-count"></span></div>
+            <div id="edge-list"></div>
+        </div>
+
+        <!-- Examples -->
+        <div class="card">
+            <div class="card-title">Ejemplos del PDF</div>
+            <div class="examples-list">
+                <div class="example-btn" onclick="loadExample('pdf1')">
+                    <span class="ex-title">Ejemplo pág. 5</span>
+                    <span class="ex-desc">Red a→z, 9 nodos, flujo máx = 8</span>
+                </div>
+                <div class="example-btn" onclick="loadExample('pdf2')">
+                    <span class="ex-title">Ejercicio pág. 7</span>
+                    <span class="ex-desc">Red O→T, 7 nodos con ciclos</span>
+                </div>
+                <div class="example-btn" onclick="loadExample('pdf3')">
+                    <span class="ex-title">Ejercicio pág. 8</span>
+                    <span class="ex-desc">Red a→z, 7 nodos carreteras</span>
+                </div>
+                <div class="example-btn" onclick="loadExample('simple')">
+                    <span class="ex-title">Red simple</span>
+                    <span class="ex-desc">s→t con 6 nodos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="panel-right">
+        <div class="mode-bar">
+            <div class="mode-dot" id="mode-dot"></div>
+            <div class="mode-text" id="mode-text"><strong>Modo Nodo</strong> — Clic para agregar nodos</div>
+        </div>
+
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="cv"></canvas>
+            <div class="canvas-hint" id="canvas-hint">Clic para colocar un nodo</div>
+        </div>
+
+        <div class="result-bar" id="result-bar">
+            <div><div class="result-label">Flujo Máximo</div><div class="result-value" id="result-flow">0</div></div>
+            <div class="result-sep"></div>
+            <div><div class="result-label">Iteraciones</div><div class="result-value" id="result-iters">0</div></div>
+            <div class="result-sep"></div>
+            <div><div class="result-label">Corte mínimo</div><div class="result-value" id="result-cut" style="font-size:.82rem">—</div></div>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps-panel" id="steps-panel" style="display:none">
+            <div class="steps-header">
+                <div class="card-title" style="margin:0">Resolución paso a paso</div>
+                <div style="display:flex;gap:6px">
+                    <button class="btn btn-secondary" onclick="stepPrev()" id="btn-prev" style="padding:4px 10px;font-size:.72rem">← Anterior</button>
+                    <button class="btn btn-primary" onclick="stepNext()" id="btn-next2" style="padding:4px 10px;font-size:.72rem">Siguiente →</button>
+                </div>
+            </div>
+            <div class="steps-scroll" id="steps-scroll"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ STATE ============
+let nodes = [];   // {id, name, x, y}
+let edges = [];   // {from, to, cap, flow}
+let mode = 'node'; // node | edge | move
+let selectedNode = null;
+let dragging = null;
+let nextId = 0;
+let sourceId = null, sinkId = null;
+
+// Ford-Fulkerson state
+let steps = [];
+let currentStep = -1;
+let isRunning = false;
+let maxFlowValue = 0;
+
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+
+function resize() {
+    const w = cv.parentElement.clientWidth, h = cv.parentElement.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    draw();
+}
+window.addEventListener('resize', resize);
+setTimeout(resize, 0);
+
+// ============ MODES ============
+function setMode(m) {
+    mode = m; selectedNode = null;
+    document.getElementById('btn-m-node').classList.toggle('active', m==='node');
+    document.getElementById('btn-m-edge').classList.toggle('active', m==='edge');
+    document.getElementById('btn-m-move').classList.toggle('active', m==='move');
+    const dot = document.getElementById('mode-dot');
+    const txt = document.getElementById('mode-text');
+    const hint = document.getElementById('canvas-hint');
+    if (m==='node') { dot.className='mode-dot'; txt.innerHTML='<strong>Modo Nodo</strong> — Clic para agregar nodos'; hint.textContent='Clic para colocar un nodo'; }
+    else if (m==='edge') { dot.className='mode-dot yellow'; txt.innerHTML='<strong>Modo Arco</strong> — Clic en nodo origen, luego destino'; hint.textContent='Clic en un nodo para iniciar el arco'; }
+    else { dot.className='mode-dot green'; txt.innerHTML='<strong>Modo Mover</strong> — Arrastra nodos para reposicionar'; hint.textContent='Arrastra un nodo para moverlo'; }
+    draw();
+}
+
+// ============ CANVAS EVENTS ============
+cv.addEventListener('mousedown', e => {
+    const {x,y} = canvasCoords(e);
+    if (mode==='move') { dragging = hitNode(x,y); return; }
+    if (mode==='node') {
+        const name = prompt('Nombre del nodo:', String.fromCharCode(97+nodes.length));
+        if (!name) return;
+        nodes.push({id: nextId++, name: name.trim(), x, y});
+        updateSelects(); updateCounts(); draw();
+    } else if (mode==='edge') {
+        const hit = hitNode(x,y);
+        if (hit===null) return;
+        if (selectedNode===null) {
+            selectedNode=hit;
+            document.getElementById('canvas-hint').textContent=`Nodo "${nodes.find(n=>n.id===hit).name}" seleccionado — clic en destino`;
+            draw();
+        } else {
+            if (hit!==selectedNode) promptEdge(selectedNode, hit);
+            selectedNode=null;
+            document.getElementById('canvas-hint').textContent='Clic en un nodo para iniciar el arco';
+            draw();
+        }
+    }
+});
+cv.addEventListener('mousemove', e => {
+    if (dragging===null) return;
+    const {x,y} = canvasCoords(e);
+    const n = nodes.find(n=>n.id===dragging);
+    if (n) { n.x=x; n.y=y; draw(); }
+});
+cv.addEventListener('mouseup', () => { dragging=null; });
+
+function canvasCoords(e) {
+    const r = cv.getBoundingClientRect();
+    return {x: e.clientX-r.left, y: e.clientY-r.top};
+}
+function hitNode(x,y) {
+    for (let i=nodes.length-1;i>=0;i--) {
+        const n=nodes[i], dx=n.x-x, dy=n.y-y;
+        if (Math.sqrt(dx*dx+dy*dy)<22) return n.id;
+    }
+    return null;
+}
+
+function promptEdge(fromId, toId) {
+    if (edges.some(e=>e.from===fromId&&e.to===toId)) { alert('Ya existe ese arco'); return; }
+    const c = prompt(`Capacidad del arco ${nodeName(fromId)} → ${nodeName(toId)}:`, '1');
+    if (!c) return;
+    const cap = parseInt(c);
+    if (isNaN(cap)||cap<=0) { alert('Capacidad inválida'); return; }
+    edges.push({from:fromId, to:toId, cap, flow:0});
+    updateEdgeList(); updateCounts(); draw();
+}
+
+function addEdgeManual() {
+    const fromId = parseInt(document.getElementById('edge-from').value);
+    const toId = parseInt(document.getElementById('edge-to').value);
+    const cap = parseInt(document.getElementById('edge-cap').value);
+    if (isNaN(fromId)||isNaN(toId)) { alert('Seleccione nodos'); return; }
+    if (fromId===toId) { alert('No se permiten lazos'); return; }
+    if (isNaN(cap)||cap<=0) { alert('Capacidad inválida'); return; }
+    if (edges.some(e=>e.from===fromId&&e.to===toId)) { alert('Ya existe ese arco'); return; }
+    edges.push({from:fromId, to:toId, cap, flow:0});
+    updateEdgeList(); updateCounts(); draw();
+}
+
+function nodeName(id) { const n=nodes.find(n=>n.id===id); return n?n.name:'?'; }
+
+// ============ DRAWING ============
+function draw() {
+    const w=cv.width/dpr, h=cv.height/dpr;
+    ctx.clearRect(0,0,w,h);
+
+    // Dot grid
+    ctx.fillStyle='#1a1a24';
+    for(let gx=20;gx<w;gx+=40) for(let gy=20;gy<h;gy+=40) { ctx.beginPath();ctx.arc(gx,gy,1,0,Math.PI*2);ctx.fill(); }
+
+    // Edges
+    edges.forEach((e,idx) => {
+        const a=nodes.find(n=>n.id===e.from), b=nodes.find(n=>n.id===e.to);
+        if(!a||!b) return;
+
+        // Check if this edge is on the current highlighted path
+        let onPath = false, onCut = false;
+        if (currentStep>=0 && currentStep<steps.length) {
+            const s = steps[currentStep];
+            if (s.pathEdges) onPath = s.pathEdges.includes(idx);
+            if (s.cutEdges) onCut = s.cutEdges.includes(idx);
+        }
+
+        // Arrow with offset for bidirectional
+        const reverse = edges.some(e2=>e2.from===e.to&&e2.to===e.from);
+        const offset = reverse ? 6 : 0;
+
+        const dx=b.x-a.x, dy=b.y-a.y, len=Math.sqrt(dx*dx+dy*dy);
+        if(len<1) return;
+        const nx=dx/len, ny=dy/len;
+        const px=-ny*offset, py=nx*offset;
+
+        const ax=a.x+nx*20+px, ay=a.y+ny*20+py;
+        const bx=b.x-nx*20+px, by=b.y-ny*20+py;
+
+        // Line
+        ctx.beginPath();
+        ctx.strokeStyle = onPath ? '#00cec9' : onCut ? '#ff6b6b' : e.flow>0 ? '#4a4a6a' : '#2a2a3a';
+        ctx.lineWidth = onPath ? 3 : e.flow>0 ? 2 : 1.5;
+        ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+
+        // Arrow head
+        const aLen=10, aAng=Math.PI/7;
+        const ang=Math.atan2(by-ay,bx-ax);
+        ctx.beginPath();
+        ctx.moveTo(bx,by);
+        ctx.lineTo(bx-aLen*Math.cos(ang-aAng), by-aLen*Math.sin(ang-aAng));
+        ctx.lineTo(bx-aLen*Math.cos(ang+aAng), by-aLen*Math.sin(ang+aAng));
+        ctx.closePath();
+        ctx.fillStyle = onPath ? '#00cec9' : onCut ? '#ff6b6b' : e.flow>0 ? '#4a4a6a' : '#2a2a3a';
+        ctx.fill();
+
+        // Label: cap, flow
+        const mx=(ax+bx)/2+py*0.5, my=(ay+by)/2-px*0.5;
+        const label = e.flow>0 ? `${e.cap}, ${e.flow}` : `${e.cap}`;
+        ctx.font='600 11px "JetBrains Mono"';
+        const tw=ctx.measureText(label).width;
+        ctx.fillStyle='rgba(10,10,15,.85)';
+        ctx.fillRect(mx-tw/2-4, my-8, tw+8, 16);
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        if (e.flow>0) {
+            // Show "cap, flow" with colors
+            const capStr = e.cap+'';
+            const flowStr = e.flow+'';
+            const cw = ctx.measureText(capStr+', ').width;
+            ctx.fillStyle='#fdcb6e';
+            ctx.fillText(capStr+',', mx - tw/2 + ctx.measureText(capStr+',').width/2, my);
+            ctx.fillStyle = e.flow>=e.cap ? '#ff6b6b' : '#00cec9';
+            ctx.fillText(flowStr, mx + tw/2 - ctx.measureText(flowStr).width/2, my);
+        } else {
+            ctx.fillStyle='#fdcb6e';
+            ctx.fillText(label, mx, my);
+        }
+    });
+
+    // Nodes
+    const R=20;
+    nodes.forEach(n => {
+        const isSource = n.id===sourceId;
+        const isSink = n.id===sinkId;
+        const isSel = (mode==='edge'&&selectedNode===n.id);
+
+        // Glow
+        if(isSel||isSource||isSink) {
+            ctx.beginPath(); ctx.arc(n.x,n.y,R+6,0,Math.PI*2);
+            ctx.fillStyle = isSource ? 'rgba(0,206,201,.2)' : isSink ? 'rgba(255,107,107,.2)' : 'rgba(108,92,231,.2)';
+            ctx.fill();
+        }
+
+        ctx.beginPath(); ctx.arc(n.x,n.y,R,0,Math.PI*2);
+        ctx.fillStyle = isSource ? '#0a2a2a' : isSink ? '#2a0a0a' : '#1a1a24';
+        ctx.fill();
+        ctx.strokeStyle = isSource ? '#00cec9' : isSink ? '#ff6b6b' : isSel ? '#a29bfe' : '#6c5ce7';
+        ctx.lineWidth=2; ctx.stroke();
+
+        ctx.fillStyle = isSource ? '#00cec9' : isSink ? '#ff6b6b' : '#a29bfe';
+        ctx.font='700 13px "JetBrains Mono"';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(n.name, n.x, n.y);
+
+        // Role label
+        if(isSource) { ctx.font='600 9px "DM Sans"'; ctx.fillStyle='#00cec9'; ctx.fillText('fuente', n.x, n.y+R+12); }
+        if(isSink) { ctx.font='600 9px "DM Sans"'; ctx.fillStyle='#ff6b6b'; ctx.fillText('sumidero', n.x, n.y+R+12); }
+    });
+}
+
+// ============ UI UPDATES ============
+function updateSelects() {
+    const opts = nodes.map(n=>`<option value="${n.id}">${n.name}</option>`).join('');
+    ['sel-source','sel-sink','edge-from','edge-to'].forEach(id => {
+        const el=document.getElementById(id);
+        const prev=el.value;
+        el.innerHTML=opts;
+        if(prev&&el.querySelector(`option[value="${prev}"]`)) el.value=prev;
+    });
+    // Auto-assign source/sink
+    if(nodes.length>=2) {
+        if(sourceId===null) { sourceId=nodes[0].id; document.getElementById('sel-source').value=sourceId; }
+        if(sinkId===null) { sinkId=nodes[nodes.length-1].id; document.getElementById('sel-sink').value=sinkId; }
+    }
+}
+document.getElementById('sel-source').addEventListener('change', e => { sourceId=parseInt(e.target.value); draw(); });
+document.getElementById('sel-sink').addEventListener('change', e => { sinkId=parseInt(e.target.value); draw(); });
+
+function updateCounts() {
+    document.getElementById('b-nodes').textContent=`Nodos: ${nodes.length}`;
+    document.getElementById('b-edges').textContent=`Arcos: ${edges.length}`;
+}
+
+function updateEdgeList() {
+    const el=document.getElementById('edge-list');
+    el.innerHTML='';
+    document.getElementById('edge-list-count').textContent=`(${edges.length})`;
+    edges.forEach((e,i) => {
+        const div=document.createElement('div');
+        div.className='edge-item';
+        div.innerHTML=`<span class="edge-nodes">${nodeName(e.from)} → ${nodeName(e.to)}</span>
+            <span><span class="edge-cap">${e.cap}</span>${e.flow>0?` <span class="edge-flow">[${e.flow}]</span>`:''}</span>`;
+        el.appendChild(div);
+    });
+}
+
+// ============ FORD-FULKERSON (BFS = Edmonds-Karp) ============
+function runFordFulkerson() {
+    if (nodes.length<2) { alert('Necesita al menos 2 nodos'); return; }
+    if (sourceId===null||sinkId===null) { alert('Seleccione fuente y sumidero'); return; }
+    if (sourceId===sinkId) { alert('Fuente y sumidero deben ser diferentes'); return; }
+
+    // Reset
+    edges.forEach(e=>e.flow=0);
+    steps = [];
+    currentStep = -1;
+    maxFlowValue = 0;
+    isRunning = true;
+
+    // Build adjacency (index-based)
+    const nodeIds = nodes.map(n=>n.id);
+
+    // Add initial step
+    steps.push({
+        type: 'init',
+        desc: `Inicializamos flujo f(e) = 0 para todos los arcos. Fuente: <strong>${nodeName(sourceId)}</strong>, Sumidero: <strong>${nodeName(sinkId)}</strong>.`,
+        flows: edges.map(()=>0),
+        totalFlow: 0,
+        pathEdges: null
+    });
+
+    // Clone flows for simulation
+    let simFlows = edges.map(()=>0);
+
+    let iteration = 0;
+    while(true) {
+        iteration++;
+        // BFS to find augmenting path in residual graph
+        const path = bfs(simFlows);
+        if (!path) {
+            // Find min cut
+            const visited = bfsReachable(simFlows);
+            const S = nodes.filter(n=>visited.has(n.id)).map(n=>n.name);
+            const T = nodes.filter(n=>!visited.has(n.id)).map(n=>n.name);
+            const cutEdgeIndices = [];
+            edges.forEach((e,i) => {
+                if(visited.has(e.from)&&!visited.has(e.to)) cutEdgeIndices.push(i);
+            });
+            const cutCap = cutEdgeIndices.reduce((s,i)=>s+edges[i].cap, 0);
+
+            steps.push({
+                type: 'done',
+                desc: `No se encontró camino aumentante de <strong>${nodeName(sourceId)}</strong> a <strong>${nodeName(sinkId)}</strong>. El algoritmo termina.`,
+                flows: [...simFlows],
+                totalFlow: maxFlowValue,
+                pathEdges: null,
+                cutEdges: cutEdgeIndices,
+                cutS: S.join(', '),
+                cutT: T.join(', '),
+                cutCap
+            });
+            break;
+        }
+
+        // Compute bottleneck
+        let bottleneck = Infinity;
+        const pathEdgeIndices = [];
+        const pathNodeNames = [nodeName(sourceId)];
+        for (const {edgeIdx, forward} of path) {
+            if(forward) {
+                bottleneck = Math.min(bottleneck, edges[edgeIdx].cap - simFlows[edgeIdx]);
+            } else {
+                bottleneck = Math.min(bottleneck, simFlows[edgeIdx]);
+            }
+            pathEdgeIndices.push(edgeIdx);
+        }
+
+        // Build path description
+        let pathDesc = nodeName(sourceId);
+        for (const {edgeIdx, forward} of path) {
+            const e = edges[edgeIdx];
+            const nextNode = forward ? e.to : e.from;
+            pathDesc += ` → ${nodeName(nextNode)}`;
+        }
+
+        // Step: found path
+        steps.push({
+            type: 'path',
+            desc: `<span class="step-num">Iteración ${iteration}:</span> Camino aumentante: <span class="step-path">${pathDesc}</span>. Cuello de botella: <span class="step-delta">Δ = ${bottleneck}</span>`,
+            flows: [...simFlows],
+            totalFlow: maxFlowValue,
+            pathEdges: pathEdgeIndices,
+            pathDetails: path,
+            bottleneck
+        });
+
+        // Update flows
+        for (const {edgeIdx, forward} of path) {
+            if(forward) simFlows[edgeIdx] += bottleneck;
+            else simFlows[edgeIdx] -= bottleneck;
+        }
+        maxFlowValue += bottleneck;
+
+        // Build edge detail string
+        let detailStr = '';
+        for (const {edgeIdx, forward} of path) {
+            const e = edges[edgeIdx];
+            if(forward) detailStr += `f(${nodeName(e.from)},${nodeName(e.to)}) = ${simFlows[edgeIdx]}/${e.cap}  `;
+            else detailStr += `f(${nodeName(e.from)},${nodeName(e.to)}) = ${simFlows[edgeIdx]}/${e.cap} (retroceso)  `;
+        }
+
+        steps.push({
+            type: 'update',
+            desc: `Actualizamos flujo: ${detailStr.trim()}. <strong>|f| = <span class="step-flow">${maxFlowValue}</span></strong>`,
+            flows: [...simFlows],
+            totalFlow: maxFlowValue,
+            pathEdges: pathEdgeIndices
+        });
+
+        if(iteration>100) break; // safety
+    }
+
+    // Show step-by-step UI
+    document.getElementById('steps-panel').style.display='flex';
+    document.getElementById('btn-step').disabled=false;
+    renderSteps();
+    currentStep = 0;
+    applyStep(0);
+}
+
+function bfs(simFlows) {
+    // Returns array of {edgeIdx, forward} or null
+    const parent = new Map(); // nodeId -> {edgeIdx, forward, prevNode}
+    const visited = new Set();
+    const queue = [sourceId];
+    visited.add(sourceId);
+
+    while(queue.length>0) {
+        const u = queue.shift();
+        if(u===sinkId) break;
+
+        // Forward edges from u
+        edges.forEach((e,i) => {
+            if(e.from===u && !visited.has(e.to) && e.cap-simFlows[i]>0) {
+                visited.add(e.to);
+                parent.set(e.to, {edgeIdx:i, forward:true, prevNode:u});
+                queue.push(e.to);
+            }
+        });
+        // Backward edges to u (reverse flow)
+        edges.forEach((e,i) => {
+            if(e.to===u && !visited.has(e.from) && simFlows[i]>0) {
+                visited.add(e.from);
+                parent.set(e.from, {edgeIdx:i, forward:false, prevNode:u});
+                queue.push(e.from);
+            }
+        });
+    }
+
+    if(!parent.has(sinkId)&&sinkId!==sourceId) return null;
+    if(sinkId===sourceId) return null;
+
+    // Reconstruct path
+    const path = [];
+    let cur = sinkId;
+    while(cur!==sourceId) {
+        const p = parent.get(cur);
+        path.unshift(p);
+        cur = p.prevNode;
+    }
+    return path;
+}
+
+function bfsReachable(simFlows) {
+    const visited = new Set();
+    const queue = [sourceId];
+    visited.add(sourceId);
+    while(queue.length>0) {
+        const u = queue.shift();
+        edges.forEach((e,i) => {
+            if(e.from===u && !visited.has(e.to) && e.cap-simFlows[i]>0) { visited.add(e.to); queue.push(e.to); }
+        });
+        edges.forEach((e,i) => {
+            if(e.to===u && !visited.has(e.from) && simFlows[i]>0) { visited.add(e.from); queue.push(e.from); }
+        });
+    }
+    return visited;
+}
+
+// ============ STEP-BY-STEP UI ============
+function renderSteps() {
+    const container = document.getElementById('steps-scroll');
+    container.innerHTML = '';
+    steps.forEach((s,i) => {
+        const div = document.createElement('div');
+        div.className = 'step-item';
+        div.id = 'step-'+i;
+        div.innerHTML = s.desc;
+        if(s.type==='done') {
+            div.innerHTML += `<br><br><strong style="color:var(--success)">Flujo máximo |f| = ${s.totalFlow}</strong>`;
+            div.innerHTML += `<br>Corte mínimo: S = {${s.cutS}}, T = {${s.cutT}}`;
+            div.innerHTML += `<br>Capacidad del corte: c(S,T) = ${s.cutCap}`;
+        }
+        div.addEventListener('click', () => { currentStep=i; applyStep(i); });
+        container.appendChild(div);
+    });
+}
+
+function applyStep(idx) {
+    currentStep = idx;
+    const s = steps[idx];
+    // Apply flows
+    edges.forEach((e,i) => e.flow = s.flows[i]);
+    // Highlight
+    document.querySelectorAll('.step-item').forEach((el,i) => {
+        el.classList.toggle('active', i===idx);
+        el.classList.toggle('done', i<idx);
+    });
+    // Scroll into view
+    const el = document.getElementById('step-'+idx);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+    // Result bar
+    const bar = document.getElementById('result-bar');
+    if(s.type==='done') {
+        bar.classList.add('visible');
+        document.getElementById('result-flow').textContent = s.totalFlow;
+        document.getElementById('result-iters').textContent = steps.filter(x=>x.type==='path').length;
+        document.getElementById('result-cut').textContent = `S={${s.cutS}} T={${s.cutT}} c=${s.cutCap}`;
+    }
+
+    updateEdgeList();
+    draw();
+}
+
+function stepNext() {
+    if(currentStep<steps.length-1) applyStep(currentStep+1);
+}
+function stepPrev() {
+    if(currentStep>0) applyStep(currentStep-1);
+}
+
+function resetFlow() {
+    edges.forEach(e=>e.flow=0);
+    steps=[]; currentStep=-1; isRunning=false;
+    document.getElementById('steps-panel').style.display='none';
+    document.getElementById('result-bar').classList.remove('visible');
+    document.getElementById('btn-step').disabled=true;
+    document.getElementById('steps-scroll').innerHTML='';
+    updateEdgeList(); draw();
+}
+
+function clearAll() {
+    nodes=[]; edges=[]; nextId=0; sourceId=null; sinkId=null;
+    resetFlow(); updateSelects(); updateCounts(); draw();
+}
+
+// ============ EXAMPLES ============
+function loadExample(name) {
+    clearAll();
+    const examples = {
+        pdf1: {
+            // Page 5-7: a,b,s,d,e,g,h,z
+            nodes: [
+                {name:'a',x:60,y:160},{name:'b',x:180,y:60},{name:'s',x:180,y:260},
+                {name:'d',x:320,y:60},{name:'e',x:320,y:260},{name:'g',x:460,y:60},
+                {name:'h',x:460,y:260},{name:'z',x:580,y:160}
+            ],
+            edges: [
+                ['a','b',7],['a','s',2],['b','s',1],['b','d',5],['s','e',4],
+                ['d','e',2],['d','g',4],['e','h',5],['g','z',3],['h','z',6],['e','g',3]
+            ],
+            source:'a', sink:'z'
+        },
+        pdf2: {
+            // Page 7: O,A,B,C,D,E,F,T
+            nodes: [
+                {name:'O',x:60,y:200},{name:'A',x:200,y:80},{name:'B',x:200,y:200},
+                {name:'C',x:200,y:340},{name:'D',x:380,y:80},{name:'E',x:380,y:200},
+                {name:'F',x:380,y:340},{name:'T',x:540,y:200}
+            ],
+            edges: [
+                ['O','A',5],['O','B',7],['O','C',4],['A','B',1],['A','D',3],
+                ['B','D',4],['B','E',5],['B','C',2],['C','E',8],['C','F',8],
+                ['D','T',9],['D','E',1],['E','D',6],['E','T',5],['F','T',4]
+            ],
+            source:'O', sink:'T'
+        },
+        pdf3: {
+            // Page 8: a,b,c,d,e,f,z
+            nodes: [
+                {name:'a',x:60,y:200},{name:'b',x:200,y:80},{name:'c',x:280,y:220},
+                {name:'d',x:200,y:340},{name:'e',x:420,y:80},{name:'f',x:420,y:260},
+                {name:'z',x:560,y:100}
+            ],
+            edges: [
+                ['a','b',4],['a','c',6],['a','d',5],['b','c',2],['b','e',5],
+                ['c','e',3],['c','f',7],['d','c',4],['d','f',8],['e','z',9],
+                ['e','f',1],['f','z',7]
+            ],
+            source:'a', sink:'z'
+        },
+        simple: {
+            nodes: [
+                {name:'s',x:80,y:180},{name:'a',x:220,y:80},{name:'b',x:220,y:280},
+                {name:'c',x:400,y:80},{name:'d',x:400,y:280},{name:'t',x:540,y:180}
+            ],
+            edges: [
+                ['s','a',10],['s','b',10],['a','b',2],['a','c',8],['a','d',4],
+                ['b','d',9],['c','t',10],['d','c',6],['d','t',10]
+            ],
+            source:'s', sink:'t'
+        }
+    };
+
+    const ex = examples[name];
+    if(!ex) return;
+
+    // Scale positions to canvas
+    const cw = cv.width/dpr, ch = cv.height/dpr;
+    const maxX = Math.max(...ex.nodes.map(n=>n.x));
+    const maxY = Math.max(...ex.nodes.map(n=>n.y));
+    const scaleX = (cw-120)/(maxX||1), scaleY = (ch-80)/(maxY||1);
+    const scale = Math.min(scaleX, scaleY, 1.5);
+    const offX = (cw - maxX*scale)/2, offY = (ch - maxY*scale)/2;
+
+    ex.nodes.forEach(n => {
+        nodes.push({id:nextId++, name:n.name, x:n.x*scale+offX-30*scale, y:n.y*scale+offY-20*scale});
+    });
+
+    ex.edges.forEach(([from,to,cap]) => {
+        const fId = nodes.find(n=>n.name===from)?.id;
+        const tId = nodes.find(n=>n.name===to)?.id;
+        if(fId!==undefined&&tId!==undefined) edges.push({from:fId, to:tId, cap, flow:0});
+    });
+
+    sourceId = nodes.find(n=>n.name===ex.source)?.id ?? null;
+    sinkId = nodes.find(n=>n.name===ex.sink)?.id ?? null;
+
+    updateSelects();
+    if(sourceId!==null) document.getElementById('sel-source').value=sourceId;
+    if(sinkId!==null) document.getElementById('sel-sink').value=sinkId;
+    updateCounts(); updateEdgeList(); draw();
+}
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight') stepNext();
+    if(e.key==='ArrowLeft') stepPrev();
+});
+
+// Init
+updateSelects(); updateCounts();
+</script>
+</body>
+</html>

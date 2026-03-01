@@ -1,573 +1,1632 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Matematica Computacional</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/style2.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="./css/index.css">
+    <title>Calculadora de Matemática Computacional</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a24;
+            --surface-3: #22222e;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --text-muted: #555568;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.15);
+            --accent-glow-strong: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --warning: #fdcb6e;
+            --danger: #ff6b6b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        html { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZJ4NQTYLHN"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+        /* ---- Navbar ---- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            color: var(--text);
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: 700;
+        }
+        .navbar a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s;
+        }
+        .navbar a:hover { color: var(--text); background: var(--surface-2); }
 
-        gtag('config', 'G-ZJ4NQTYLHN');
-    </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7986550598269480"
-        crossorigin="anonymous"></script>
+        /* ---- Layout ---- */
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ---- Sidebar ---- */
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 16px 12px;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .sidebar-section { margin-bottom: 8px; }
+        .sidebar-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 8px 12px 6px;
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            transition: all 0.15s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+        .sidebar-item:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+        .sidebar-item.active {
+            background: var(--accent-glow);
+            color: var(--accent-light);
+            border-color: rgba(108, 92, 231, 0.2);
+        }
+        .sidebar-item .icon {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .sidebar-item a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .sidebar-dropdown-items {
+            display: none;
+            padding-left: 20px;
+        }
+        .sidebar-dropdown-items.open { display: block; }
+        .sidebar-dropdown-toggle::after {
+            content: '›';
+            margin-left: auto;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .sidebar-dropdown-toggle.open::after { transform: rotate(90deg); }
+
+        /* External links in sidebar */
+        a.sidebar-link {
+            text-decoration: none;
+            position: relative;
+        }
+        a.sidebar-link .external {
+            margin-left: auto;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.15s;
+            color: var(--text-muted);
+        }
+        a.sidebar-link:hover .external { opacity: 1; }
+        a.sidebar-link:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        /* ---- Main Content ---- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 40px;
+            background: var(--bg);
+        }
+        .main-content::-webkit-scrollbar { width: 6px; }
+        .main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* ---- Module Container ---- */
+        .module { display: none; animation: fadeIn 0.3s ease; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .module-header {
+            margin-bottom: 28px;
+        }
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .module-desc {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+        }
+
+        /* ---- Cards ---- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .card-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .card-col { flex: 1; min-width: 260px; }
+
+        /* ---- Matrix Grid ---- */
+        .matrix-grid {
+            display: inline-grid;
+            gap: 4px;
+            padding: 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        .matrix-grid input {
+            width: 48px;
+            height: 40px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+            transition: all 0.15s;
+        }
+        .matrix-grid input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        /* ---- Input fields ---- */
+        .input-field {
+            height: 40px;
+            padding: 0 12px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+            transition: all 0.15s;
+        }
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .input-sm { width: 56px; text-align: center; }
+        .input-md { width: 80px; text-align: center; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 18px;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: #5b4bd6; box-shadow: 0 2px 12px var(--accent-glow-strong); }
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+        .btn-danger {
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        .btn-danger:hover { background: rgba(255, 107, 107, 0.2); }
+        .btn-success {
+            background: rgba(0, 206, 201, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(0, 206, 201, 0.2);
+        }
+        .btn-success:hover { background: rgba(0, 206, 201, 0.2); }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        /* ---- Histogram inputs ---- */
+        .histogram-inputs {
+            display: flex;
+            gap: 6px;
+            align-items: flex-end;
+        }
+        .histogram-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .histogram-col input {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+            transition: all 0.15s;
+        }
+        .histogram-col input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        .histogram-col label {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* ---- Canvas ---- */
+        .chart-canvas {
+            width: 100%;
+            max-width: 560px;
+            height: 260px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ---- Range bracket ---- */
+        .range-bracket {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* ---- Mask grid (3x3) ---- */
+        .mask-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        .mask-grid input {
+            width: 52px;
+            height: 40px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text);
+            outline: none;
+        }
+        .mask-grid input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        /* ---- Congruencia layout ---- */
+        .congruence-formula {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--mono);
+            font-size: 1rem;
+            color: var(--text-dim);
+            flex-wrap: wrap;
+        }
+        .congruence-formula input { width: 56px; text-align: center; }
+
+        /* ---- Steps display ---- */
+        .steps-display {
+            padding: 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+        }
+        .steps-display .step { margin-bottom: 4px; }
+        .steps-display .step:empty { display: none; }
+
+        /* ---- Result box ---- */
+        .result-box {
+            padding: 14px 18px;
+            background: var(--accent-glow);
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            border-radius: var(--radius-sm);
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+
+        /* ---- RSA ---- */
+        .rsa-primes-list {
+            max-height: 140px;
+            overflow-y: auto;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+        }
+        .rsa-primes-list::-webkit-scrollbar { width: 4px; }
+        .rsa-primes-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .rsa-prime-item {
+            padding: 6px 12px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            transition: all 0.15s;
+        }
+        .rsa-prime-item:hover { background: var(--accent-glow); color: var(--accent-light); }
+        .rsa-prime-item.selected { background: var(--accent-glow); color: var(--accent-light); }
+        .rsa-keys {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .rsa-key {
+            padding: 10px 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            flex: 1;
+            min-width: 200px;
+        }
+        .rsa-key .label { color: var(--text-muted); font-size: 0.72rem; margin-bottom: 4px; }
+        .rsa-key .value { color: var(--accent-light); font-weight: 600; }
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .radio-label input[type="radio"] { accent-color: var(--accent); }
+
+        /* ---- Game Theory Table ---- */
+        .game-table {
+            border-collapse: separate;
+            border-spacing: 2px;
+            margin: 0 auto;
+        }
+        .game-table th {
+            padding: 8px 14px;
+            background: var(--surface-3);
+            font-family: var(--mono);
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            border-radius: var(--radius-xs);
+        }
+        .game-table td {
+            padding: 6px 8px;
+            background: var(--surface-2);
+            border-radius: var(--radius-xs);
+            text-align: center;
+        }
+        .game-table td input {
+            width: 36px;
+            height: 32px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            outline: none;
+        }
+        .game-table td input:focus { border-color: var(--accent); }
+        .game-table td label { color: var(--text-muted); margin: 0 2px; font-family: var(--mono); font-size: 0.8rem; }
+        .game-table .corner { background: transparent; }
+
+        /* ---- Spacer ---- */
+        .spacer { height: 16px; }
+        .spacer-sm { height: 10px; }
+
+        /* ---- Divider ---- */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .divider span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main-content { padding: 20px; }
+            .card-row { flex-direction: column; }
+        }
+    </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <span class="navbar-brand titulo">
-                <img src="./img/img1.png" width="40" class="me-4 ms-3" id="imagen">
-                MATEMÁTICA COMPUTACIONAL: CALCULADORA
-            </span>
-            <ul class="navbar-nav mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="https://calculadora-v1-2-0.vercel.app/">Versión 2.0.0</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="https://wa.me/51904435631?text=Hola Carlos!" target="_blank">Contacto</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <div class="row ct">
-            <div class="col col-2 c1 text-center">
-                <ul class="list-group lista mt-4  mb-3">
-                    <li class="activo" onclick="activarContenido(div_expancion)">Expancion
-                        de un histograma</li>
-                    <li onclick="activarContenido(div_ecualizacion)">Ecualizacion
-                        de un histograma</li>
-                    <li>
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Filtros
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" onclick="activarContenido(div_laplaciano)"
-                                        href="#">laplaciano</a></li>
-                                <li><a class="dropdown-item" onclick="activarContenido(div_media)" href="#">Media</a>
-                                </li>
-                                <li><a class="dropdown-item" onclick="activarContenido(div_mediana)"
-                                        href="#">Mediana</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Aritmetica Modular
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" onclick="activarContenido(div_congruencia)"
-                                        href="#">Congruencias
-                                        lineales</a></li>
-                                <li><a class="dropdown-item" onclick="activarContenido(div_encriptacion)"
-                                        href="#">Encriptacion RSA</a></li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li onclick="activarContenido(div_matrizCaminos)">Matriz
-                        de Caminos</li>
-                    <li onclick="activarContenido(div_conexas)">Componentes
-                        conexas</li>
-                    <li onclick="irHamiltoniano()"><a href="./assets/hamiltoniano.html" target="_blank"
-                            class="ancla">Ciclo
-                            Hamiltoniano</a></li>
-                    <li><a href="https://graphonline.ru/es/" target="_blank" class="ancla">Algoritmo de
-                            Ford-Fulkerson</a></li>
-                    <li><a href="https://graphonline.ru/es/" target="_blank" class="ancla">Algoritmo de
-                            Dikstra</a></li>
-                    <li><a href="./assets/huffman/index.html" target="_blank" class="ancla">Algoritmo de
-                            Huffman</a></li>
-                    <li onclick="activarContenido(div_juegos)">Teoria de
-                        Juegos</li>
-                    <li><a href="./assets/DiagramaHasse/index.html" target="_blank" class="ancla">Diagrama de
-                            Hasse</a></li>
-                    <li><a href="./assets/tablas-verdad/index.html" target="_blank" class="ancla">Tablas de
-                            verdad</a></li>
-                </ul>
-            </div>
-            <div class="col col-8 col-sm-10 col-xl-8 text-center bg-light main">
-                <div class="contenedor rounded desactivado" id="matriz-caminos">
-                    <h3 class="mt-2">Matriz de Caminos</h3>
-                    <div class="contenido d-flex  justify-content-center">
-                        <div class="caja">
-                            <p class="mt-3 text-dark">Matriz A:</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="matriz1">
-                                    <!-- contenido -->
-                                </div>
-                            </div>
-                            <div class="d-flex  justify-content-center p-2">
-                                <input type="button" value="1" onclick="completar(1)" class="me-2 btn-yes">
-                                <input type="button" value="0" onclick="completar(0)" class="me-2 btn-yes">
-                                <input type="button" value="C" onclick="completar('')" class="me-2 btn-yes">
-                                <input type="button" onclick="aumentarMatriz()" value="+" class="me-2 btn-yes">
-                                <input type="button" onclick="disminuirMatriz()" value="-" class="me-2 btn-yes">
-                                <input type="button" class="btn-main" onclick="aplicarAlgoritmo()" value="Aceptar"
-                                    class="me-2">
-                            </div>
-                            <hr class="bg-dark">
-                            <p class="text-dark">Resultado</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="matriz2 mb-5">
-                                    <!-- contenido -->
-                                </div>
-                            </div>
-                        </div>
 
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="filtro-laplaciano">
-                    <h3 class="mt-2">Filtro de laplaciano</h3>
-                    <div class="contenido">
-                        <div class="d-flex mt-4">
-                            <div class="original ms-3 d-flex align-items-center">
-                                <div class="original-container shadow-sm">
-                                    <p class="text-dark">Matriz A:</p>
-                                    <div class="original-matriz mb-2">
-                                        <!-- contenido -->
-                                    </div>
-                                    <input type="button" value="+" onclick="GenerarMatriz('+')" class="btn-dark">
-                                    <input type="button" value="-" onclick="GenerarMatriz('-')" class="btn-warning">
-                                    <input type="button" value="C" onclick="LimpiarLaplaciano()" class="btn-danger">
-                                    <input type="button" value="Aceptar" onclick="resultadoLaplaciano()"
-                                        class="btn-primary">
-                                </div>
-                            </div>
-                            <div class="mascara ms-5 mt-3 shadow-sm">
-                                <p class="mb-1 text-dark">Mascara</p>
-                                <div class="mascara-matriz">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                    <input type="text" class="cj-mascara-laplaciano">
-                                </div>
-                                <input type="button" value="C" onclick="limpiarMascara()" class="btn-danger me-2">
-                                <input type="button" value="-" onclick="CambiarValores('-')" class="btn-primary me-2">
-                                <input type="button" value="+" onclick="CambiarValores('+')" class="btn-success me-2">
-                            </div>
-                        </div>
-                        <div class="d-flex mt-3">
-                            <hr class="bg-dark w-50 me-3">
-                            <p class="text-dark">Resultado</p>
-                            <hr class="bg-dark w-50 ms-3">
-                        </div>
-                        <div class="resultado mb-5">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                            <input type="text" class="cj-resultado-laplaciano">
-                        </div>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="filtro-media">
-                    <h3 class="mt-2">Filtro de Media</h3>
-                    <div class="contenido">
-                        <div class="d-flex mt-4">
-                            <div class="original ms-3 d-flex align-items-center">
-                                <div class="original-container shadow-sm">
-                                    <p class="text-dark">Matriz A:</p>
-                                    <div class="original-matriz-media mb-2">
-                                        <!-- contenido -->
-                                    </div>
-                                    <input type="button" value="+" onclick="GenerarMatrizMedia('+')" class="btn-dark">
-                                    <input type="button" value="-" onclick="GenerarMatrizMedia('-')"
-                                        class="btn-warning">
-                                    <input type="button" value="C" onclick="limpiarMedia()" class="btn-danger">
-                                    <input type="button" value="Aceptar" onclick="ResultadoMedia()" class="btn-primary">
-                                </div>
-                            </div>
-                            <div class="mascara ms-5 mt-3 shadow-sm">
-                                <p class="mb-1 text-dark">Mascara</p>
-                                <div class="mascara-matriz">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                    <input type="text" class="cj-mascara-media">
-                                </div>
-                                <input type="button" value="C" onclick="limpiarMascaraMedia()" class="btn-danger me-2">
-                                <input type="button" value="-" onclick="LlenarMascara('-')" class="btn-primary me-2">
-                                <input type="button" value="+" onclick="LlenarMascara('+')" class="btn-success me-2">
-                            </div>
-                        </div>
-                        <div class="d-flex mt-3">
-                            <hr class="bg-dark w-50 me-3">
-                            <p class="text-dark">Resultado</p>
-                            <hr class="bg-dark w-50 ms-3">
-                        </div>
-                        <div class="resultado-media mb-5">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                            <input type="text" class="cj-resultado-media">
-                        </div>
-                    </div>
-
-                </div>
-                <div class="contenedor rounded desactivado" id="filtro-mediana">
-                    <h3 class="mt-2">Filtro de Mediana</h3>
-                    <div class="contenido">
-                        <div class="original-mediana shadow-sm d-flex align-items-center justify-content-center">
-                            <div>
-                                <div class="matriz-mediana">
-                                    <!-- contenido -->
-                                </div>
-                                <div class="mt-2">
-                                    <input type="button" value="+" onclick="GenerarMatrizMediana('+')" class="btn-yes">
-                                    <input type="button" value="-" onclick="GenerarMatrizMediana('-')" class="btn-yes">
-                                    <input type="button" value="C" onclick="limpiarMediana()" class="btn-yes">
-                                    <input type="button" value="Aceptar" onclick="ResultadoMediana()" class="btn-main">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex mt-3">
-                            <hr class="bg-dark w-50 me-3">
-                            <p class="text-dark">Resultado</p>
-                            <hr class="bg-dark w-50 ms-3">
-                        </div>
-                        <div class="resultado-mediana mb-5">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                            <input type="text" class="cj-resultado-mediana">
-                        </div>
-                    </div>
-                </div>
-                <div class="contenedor rounded activado" id="expancion-histograma">
-
-                    <div class="contenido p-2">
-                        <div class="mt-3">
-                            <p class=" my-3 fw-bold">Complete el histograma
-                                original</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">0</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">1</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">2</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">3</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">4</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">5</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">6</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-expancion">
-                                    <label class="fw-light">7</label>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <button onclick="limpiarExpancion()" class="me-3 btn-yes">C</button>
-                                <button onclick="dibujarHistogramaExpancion()" class="btn-main">Resultado</button>
-                                <label class="ms-5">[</label>
-                                <input type="text" class="min text-center" value="1">
-                                <label>;</label>
-                                <input type="text" class="max text-center" value="7">
-                                <label>]</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="Resultado mt-4 text-center">
-                        <h6 class="ms-auto text-dark">Histograma
-                            resultante</h6>
-                        <canvas class="canvas-expancion">
-                        </canvas>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="ecualizacion-histograma">
-                    <div class="contenido p-2">
-                        <div class="mt-3">
-                            <p class=" my-2 fw-bold">Complete el histograma
-                                original</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">0</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">1</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">2</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">3</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">4</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">5</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">6</label>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <input type="text" class="cj-ecualizacion">
-                                    <label class="fw-light">7</label>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <input type="button" value="C" onclick="limpiarEcualizacion()" class="me-3 btn-yes">
-                                <input type="button" onclick="dibujarHistogramaEcualizacion()" value="Resultado"
-                                    class="btn-main">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="Resultado mt-2 text-center">
-                        <h6 class="ms-auto text-dark">Histograma
-                            resultante</h6>
-                        <canvas class="canvas-ecualizacion">
-
-                        </canvas>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="congruencias">
-                    <h3 class="mt-2">Congruencias
-                        lineales</h3>
-                    <div class="contenido-congruencia mt-5 d-flex text-dark">
-                        <div class="cont cont1 rounded-2">
-                            <h4 class="mt-3">ax=b mod n</h4>
-                            <div class="d-flex justify-content-around">
-                                <input type="text" class="caja2 txta">
-                                <h4>x=</h4>
-                                <input type="text" class="caja2 txtb">
-                                <h4>mod</h4>
-                                <input type="text" class="caja2 txtn">
-                            </div>
-                            <input type="button" value="C" onclick="limpiar()" class="btn-yes">
-                            <button class="mt-3 btn-main" onclick="ResultadoCongruencia()">Resultado</button>
-                            <div class="resultado-congruencia mt-4">
-                                <h4 class="ms-auto txtrespuesta1"></h4>
-                                <h4 class="ms-auto txtrespuesta2"></h4>
-                            </div>
-                        </div>
-                        <div class="cont cont2 rounded-2">
-                            <h5 class="mb-3 mt-3"><ins>Resolucion:</ins></h5>
-                            <h6 class="paso1"></h6>
-                            <h6 class="paso2"></h6>
-                            <h6 class="paso3"></h6>
-                            <h6 class="paso4"></h6>
-                            <h6 class="paso5"></h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="encriptacion">
-                    <h3 class="text-white bg-dark">Encriptacion RSA</h3>
-                    <div class="contenido-encriptacion text-dark">
-                        <p class="mb-1 mt-3">Seleccione dos numeros
-                            primos</p>
-                        <input type="text" class="primos primo1">
-                        <input type="text" class="primos primo2">
-                        <input type="button" value="Aceptar" onclick="GenerarPrimos()" class="btn-primary">
-                        <div class="mt-3">
-                            <p class="mb-1">Seleccione un valor para 'd'</p>
-                            <div class="lista-encriptacion">
-                                <ul class="lista-primos list-group">
-                                </ul>
-                            </div>
-                            <div class="mt-4 claves">
-                                <p class="clave-privada">Clave Privada:
-                                    -</p>
-                                <p class="clave-publica">Clave Pública:
-                                    -</p>
-                            </div>
-                            <div>
-                                <form>
-                                    <label>Encriptar </label>
-                                    <input type="radio" name="op" id="encriptar" class="me-2">
-                                    <label>Desencriptar </label>
-                                    <input type="radio" name="op" id="desencriptar" class="mb-3">
-                                    <br>
-                                    <label class="me-2">Valor: </label>
-                                    <input type="text" class="primos me-3 valor">
-                                    <input type="button" value="Resultado" onclick="ResultadoEncriptar()"
-                                        class="btn-success">
-                                </form>
-                                <h6 class="mt-4 me-5 res">Resultado: -</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="conexas">
-                    <h3 class="mt-2">Componentes conexas</h3>
-                    <div class="contenido-conexas d-flex  justify-content-center">
-                        <div class="caja">
-                            <p class="mt-3 text-dark">Matriz A:</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="original-matriz-conexas">
-                                    <!-- contenido -->
-                                </div>
-                            </div>
-                            <div class="d-flex  justify-content-center p-2">
-                                <input type="button" value="1" onclick="LlenarMatriz(1)" class="me-2 btn-yes">
-                                <input type="button" value="0" onclick="LlenarMatriz(0)" class="me-2 btn-yes">
-                                <input type="button" value="C" onclick="LlenarMatriz('')" class="me-2 btn-yes">
-                                <input type="button" onclick="GenerarMatrizConexas('+')" value="+" class="me-2 btn-yes">
-                                <input type="button" onclick="GenerarMatrizConexas('-')" value="-" class="me-2 btn-yes">
-                                <input type="button" class="btn-main" onclick="ResultadoConexas()" value="Aceptar"
-                                    class="me-2">
-                            </div>
-                            <hr class="bg-dark">
-                            <p class="text-dark">Resultado</p>
-                            <div class="d-flex  justify-content-center">
-                                <div class="resultado-matriz-conexas mb-5">
-                                    <!-- contenido -->
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="hamiltoniano">
-                    <h3 class="text-white bg-dark">Ciclo Hamiltoniano
-                        (Camino minimo)</h3>
-                    <div class="contenido-hamiltoniano text-dark">
-                        <div class="botones mb-2 mt-3  w-75 ms-0">
-                            <input type="button" onclick="activarBoton(0)"
-                                class="botones-hamiltoniano btn btn-danger border border-dark me-2"
-                                value="+Agregar vertice">
-                            <input type="button" onclick="activarBoton(1)"
-                                class="botones-hamiltoniano btn btn-secondary border border-dark me-2"
-                                value="Conectar vertices">
-                            <input type="button" onclick="activarBoton(2)"
-                                class="botones-hamiltoniano btn btn-secondary border border-dark me-2" value="Remover">
-                            <input type="button" onclick="Deshacer()" class="btn btn-warning  me-2" value="Deshacer">
-                            <input type="button" value="Finalizar" class="btn btn-primary">
-                        </div>
-                        <div class="d-flex">
-                            <div class="mt-2 ms-3 me-2 w-75">
-                                <div class="pizarra">
-                                </div>
-                                <p class="cantidad-vertices">Cantidad de
-                                    vertices: -</p>
-                            </div>
-                            <div class="conexion bg-white mt-2 me-2">
-                                <h5 class="bg-secondary p-1 text-white rounded-3">Agregar
-                                    arista
-                                </h5>
-                                <div class>
-                                    <label class="me-2">Peso de la arista:
-                                    </label>
-                                    <input type="text" class="txtpeso">
-                                </div>
-                                <input type="button" value="Aceptar" class="btn btn-warning mt-2 border border-dark">
-                            </div>
-                        </div>
-                        <h6 class="resultado-hamiltoniano mt-5">Camino
-                            minimo: -</h6>
-                    </div>
-                </div>
-                <div class="contenedor rounded desactivado" id="juegos">
-                    <h3 class="text-white bg-dark">Teoria de Juegos
-                        (Estretegias puras)</h3>
-                    <div class="contenido-juegos text-dark">
-                        <div class="contenedor-tabla mt-5">
-                            <table class="table table-primary">
-                                <thead>
-                                    <tr class="table-dark cabeza">
-                                        <th scope="col" class="table-secondary"></th>
-                                        <!-- contenido -->
-                                    </tr>
-                                </thead>
-                                <tbody class="cuerpo">
-                                    <!-- contenido -->
-                                </tbody>
-                            </table>
-                            <div class="mt-3">
-                                <input type="button" value="+" onclick="GenerarTabla('+')"
-                                    class="btn-success me-2 boton-juegos">
-                                <input type="button" value="-" onclick="GenerarTabla('-')"
-                                    class="btn-warning me-2 boton-juegos">
-                                <input type="button" value="Aceptar" onclick="MostrarResultado()" class="btn-primary">
-                            </div>
-                        </div>
-                        <h6 class="resultado-juegos">Equilibrio de Nash:
-                            -</h6>
-                    </div>
-                </div>
-            </div>
-            <div class="col col-2 text-center">
-                ACTIVE
-            </div>
-        </div>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-brand">
+        <div class="brand-icon">∑</div>
+        MATEMÁTICA COMPUTACIONAL
     </div>
-    <script src="./js/index.js"></script>
-    <script src="./js/juegos.js"></script>
-    <script src="./js/conexas.js"></script>
-    <script src="./js/encriptacion.js"></script>
-    <script src="./js/congruencia.js"></script>
-    <script src="./js/mediana.js"></script>
-    <script src="./js/media.js"></script>
-    <script src="./js/laplaciano.js"></script>
-    <script src="./js/expancion.js"></script>
-    <script src="./js/bootstrap.bundle.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/matriz-camino.js"></script>
-</body>
+    <a href="https://wa.me/51904435631?text=Hola Carlos!" target="_blank">Contacto →</a>
+</nav>
 
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Histogramas</div>
+            <div class="sidebar-item active" data-module="expansion">
+                <span class="icon">📊</span> Expansión
+            </div>
+            <div class="sidebar-item" data-module="equalization">
+                <span class="icon">📈</span> Ecualización
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Filtros</div>
+            <div class="sidebar-item" data-module="laplacian">
+                <span class="icon">🔲</span> Laplaciano
+            </div>
+            <div class="sidebar-item" data-module="mean">
+                <span class="icon">⊞</span> Media
+            </div>
+            <div class="sidebar-item" data-module="median">
+                <span class="icon">⊟</span> Mediana
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Aritmética Modular</div>
+            <div class="sidebar-item" data-module="congruence">
+                <span class="icon">≡</span> Congruencias lineales
+            </div>
+            <div class="sidebar-item" data-module="rsa">
+                <span class="icon">🔐</span> Encriptación RSA
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Grafos & Matrices</div>
+            <div class="sidebar-item" data-module="paths">
+                <span class="icon">🔀</span> Matriz de Caminos
+            </div>
+            <div class="sidebar-item" data-module="connected">
+                <span class="icon">🔗</span> Componentes conexas
+            </div>
+            <a href="./assets/huffman/index.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">🌳</span> Algoritmo de Huffman
+                <span class="external">↗</span>
+            </a>
+            <a href="./disktra.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">📍</span> Algoritmo de Dijkstra
+                <span class="external">↗</span>
+            </a>
+            <a href="./ford.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">🔀</span> Algoritmo de Ford-Fulkerson
+                <span class="external">↗</span>
+            </a>
+            <a href="./assets/hamiltoniano.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">🔄</span> Ciclo Hamiltoniano
+                <span class="external">↗</span>
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Teoría de Juegos</div>
+            <div class="sidebar-item" data-module="games">
+                <span class="icon">🌳</span> Ecuaciones en diferencia
+            </div>
+            <div class="sidebar-item" data-module="games">
+                <span class="icon">🎯</span> Estrategias puras
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Matemática Discreta</div>
+            <a href="./assets/tablas-verdad/index.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">📋</span> Tablas de verdad
+                <span class="external">↗</span>
+            </a>
+            <a href="./assets/DiagramaHasse/index.html" target="_blank" class="sidebar-item sidebar-link">
+                <span class="icon">🔺</span> Diagrama de Hasse
+                <span class="external">↗</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+        <!-- ====== EXPANSION ====== -->
+        <div class="module active" id="mod-expansion">
+            <div class="module-header">
+                <div class="module-title">Expansión de Histograma</div>
+                <div class="module-desc">Redistribuye los valores del histograma en un rango dado [min; max].</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Histograma Original</div>
+                <div class="histogram-inputs" id="expansion-inputs">
+                    <div class="histogram-col"><input type="text" id="exp-0"><label>0</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-1"><label>1</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-2"><label>2</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-3"><label>3</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-4"><label>4</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-5"><label>5</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-6"><label>6</label></div>
+                    <div class="histogram-col"><input type="text" id="exp-7"><label>7</label></div>
+                </div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-danger" onclick="ExpansionModule.clear()">Limpiar</button>
+                    <button class="btn btn-primary" onclick="ExpansionModule.compute()">Resultado</button>
+                    <div class="range-bracket">
+                        [ <input type="text" class="input-field input-sm" id="exp-min" value="1"> ;
+                          <input type="text" class="input-field input-sm" id="exp-max" value="7"> ]
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Histograma Resultante</div>
+                <canvas class="chart-canvas" id="canvas-expansion"></canvas>
+            </div>
+        </div>
+
+        <!-- ====== EQUALIZATION ====== -->
+        <div class="module" id="mod-equalization">
+            <div class="module-header">
+                <div class="module-title">Ecualización de Histograma</div>
+                <div class="module-desc">Redistribuye los niveles de intensidad para obtener un histograma uniforme.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Histograma Original</div>
+                <div class="histogram-inputs" id="equalization-inputs">
+                    <div class="histogram-col"><input type="text" id="eq-0"><label>0</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-1"><label>1</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-2"><label>2</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-3"><label>3</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-4"><label>4</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-5"><label>5</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-6"><label>6</label></div>
+                    <div class="histogram-col"><input type="text" id="eq-7"><label>7</label></div>
+                </div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-danger" onclick="EqualizationModule.clear()">Limpiar</button>
+                    <button class="btn btn-primary" onclick="EqualizationModule.compute()">Resultado</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Histograma Resultante</div>
+                <canvas class="chart-canvas" id="canvas-equalization"></canvas>
+            </div>
+        </div>
+
+        <!-- ====== LAPLACIAN ====== -->
+        <div class="module" id="mod-laplacian">
+            <div class="module-header">
+                <div class="module-title">Filtro Laplaciano</div>
+                <div class="module-desc">Aplica una máscara laplaciana para detección de bordes en imágenes.</div>
+            </div>
+            <div class="card">
+                <div class="card-row">
+                    <div class="card-col">
+                        <div class="card-title">Matriz Original</div>
+                        <div id="laplacian-matrix" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                        <div class="spacer"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="LaplacianModule.resize(1)">+</button>
+                            <button class="btn btn-secondary" onclick="LaplacianModule.resize(-1)">−</button>
+                            <button class="btn btn-danger" onclick="LaplacianModule.clearMatrix()">C</button>
+                            <button class="btn btn-primary" onclick="LaplacianModule.compute()">Aceptar</button>
+                        </div>
+                    </div>
+                    <div class="card-col">
+                        <div class="card-title">Máscara 3×3</div>
+                        <div id="laplacian-mask" class="mask-grid"></div>
+                        <div class="spacer"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="LaplacianModule.prevMask()">◀</button>
+                            <button class="btn btn-secondary" onclick="LaplacianModule.nextMask()">▶</button>
+                            <button class="btn btn-danger" onclick="LaplacianModule.clearMask()">C</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Resultado</div>
+                <div id="laplacian-result" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </div>
+
+        <!-- ====== MEAN FILTER ====== -->
+        <div class="module" id="mod-mean">
+            <div class="module-header">
+                <div class="module-title">Filtro de Media</div>
+                <div class="module-desc">Suaviza la imagen promediando los valores vecinos con una máscara ponderada.</div>
+            </div>
+            <div class="card">
+                <div class="card-row">
+                    <div class="card-col">
+                        <div class="card-title">Matriz Original</div>
+                        <div id="mean-matrix" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                        <div class="spacer"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="MeanModule.resize(1)">+</button>
+                            <button class="btn btn-secondary" onclick="MeanModule.resize(-1)">−</button>
+                            <button class="btn btn-danger" onclick="MeanModule.clearMatrix()">C</button>
+                            <button class="btn btn-primary" onclick="MeanModule.compute()">Aceptar</button>
+                        </div>
+                    </div>
+                    <div class="card-col">
+                        <div class="card-title">Máscara 3×3</div>
+                        <div id="mean-mask" class="mask-grid"></div>
+                        <div class="spacer"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="MeanModule.prevMask()">◀</button>
+                            <button class="btn btn-secondary" onclick="MeanModule.nextMask()">▶</button>
+                            <button class="btn btn-danger" onclick="MeanModule.clearMask()">C</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Resultado</div>
+                <div id="mean-result" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </div>
+
+        <!-- ====== MEDIAN FILTER ====== -->
+        <div class="module" id="mod-median">
+            <div class="module-header">
+                <div class="module-title">Filtro de Mediana</div>
+                <div class="module-desc">Reduce ruido tomando la mediana de los valores vecinos.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Matriz Original</div>
+                <div id="median-matrix" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="MedianModule.resize(1)">+</button>
+                    <button class="btn btn-secondary" onclick="MedianModule.resize(-1)">−</button>
+                    <button class="btn btn-danger" onclick="MedianModule.clearMatrix()">C</button>
+                    <button class="btn btn-primary" onclick="MedianModule.compute()">Aceptar</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Resultado</div>
+                <div id="median-result" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </div>
+
+        <!-- ====== CONGRUENCE ====== -->
+        <div class="module" id="mod-congruence">
+            <div class="module-header">
+                <div class="module-title">Congruencias Lineales</div>
+                <div class="module-desc">Resuelve ecuaciones de la forma ax ≡ b (mod n).</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Ecuación</div>
+                <div class="congruence-formula">
+                    <input type="text" class="input-field input-sm" id="cong-a" placeholder="a">
+                    <span>x ≡</span>
+                    <input type="text" class="input-field input-sm" id="cong-b" placeholder="b">
+                    <span>(mod</span>
+                    <input type="text" class="input-field input-sm" id="cong-n" placeholder="n">
+                    <span>)</span>
+                </div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-danger" onclick="CongruenceModule.clear()">Limpiar</button>
+                    <button class="btn btn-primary" onclick="CongruenceModule.compute()">Resultado</button>
+                </div>
+            </div>
+            <div class="card-row">
+                <div class="card card-col">
+                    <div class="card-title">Resultado</div>
+                    <div class="result-box" id="cong-result">—</div>
+                </div>
+                <div class="card card-col">
+                    <div class="card-title">Resolución</div>
+                    <div class="steps-display" id="cong-steps">
+                        <div class="step" id="cong-s1"></div>
+                        <div class="step" id="cong-s2"></div>
+                        <div class="step" id="cong-s3"></div>
+                        <div class="step" id="cong-s4"></div>
+                        <div class="step" id="cong-s5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== RSA ====== -->
+        <div class="module" id="mod-rsa">
+            <div class="module-header">
+                <div class="module-title">Encriptación RSA</div>
+                <div class="module-desc">Genera claves RSA y encripta/desencripta valores numéricos.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">1. Seleccione dos números primos</div>
+                <div class="btn-group">
+                    <input type="text" class="input-field input-md" id="rsa-p" placeholder="p">
+                    <input type="text" class="input-field input-md" id="rsa-q" placeholder="q">
+                    <button class="btn btn-primary" onclick="RSAModule.generatePrimes()">Generar</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">2. Seleccione un valor para 'd'</div>
+                <div id="rsa-primes-list" class="rsa-primes-list" style="min-height: 40px;"></div>
+                <div class="spacer"></div>
+                <div class="rsa-keys">
+                    <div class="rsa-key">
+                        <div class="label">CLAVE PRIVADA</div>
+                        <div class="value" id="rsa-private">—</div>
+                    </div>
+                    <div class="rsa-key">
+                        <div class="label">CLAVE PÚBLICA</div>
+                        <div class="value" id="rsa-public">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">3. Encriptar / Desencriptar</div>
+                <div class="radio-group" style="margin-bottom: 12px;">
+                    <label class="radio-label"><input type="radio" name="rsa-op" id="rsa-encrypt"> Encriptar</label>
+                    <label class="radio-label"><input type="radio" name="rsa-op" id="rsa-decrypt"> Desencriptar</label>
+                </div>
+                <div class="btn-group">
+                    <input type="text" class="input-field input-md" id="rsa-value" placeholder="Valor">
+                    <button class="btn btn-primary" onclick="RSAModule.compute()">Resultado</button>
+                </div>
+                <div class="spacer"></div>
+                <div class="result-box" id="rsa-result">—</div>
+            </div>
+        </div>
+
+        <!-- ====== PATH MATRIX ====== -->
+        <div class="module" id="mod-paths">
+            <div class="module-header">
+                <div class="module-title">Matriz de Caminos</div>
+                <div class="module-desc">Calcula la matriz de alcanzabilidad (caminos) a partir de una matriz de adyacencia.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Matriz de Adyacencia</div>
+                <div id="paths-matrix" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="PathsModule.fill(1)">1</button>
+                    <button class="btn btn-secondary" onclick="PathsModule.fill(0)">0</button>
+                    <button class="btn btn-danger" onclick="PathsModule.fill('')">C</button>
+                    <button class="btn btn-secondary" onclick="PathsModule.resize(1)">+</button>
+                    <button class="btn btn-secondary" onclick="PathsModule.resize(-1)">−</button>
+                    <button class="btn btn-primary" onclick="PathsModule.compute()">Aceptar</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Resultado</div>
+                <div id="paths-result" class="matrix-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </div>
+
+        <!-- ====== CONNECTED COMPONENTS ====== -->
+        <div class="module" id="mod-connected">
+            <div class="module-header">
+                <div class="module-title">Componentes Conexas</div>
+                <div class="module-desc">Encuentra las componentes conexas del grafo mediante su matriz de adyacencia.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Matriz de Adyacencia</div>
+                <div id="connected-matrix" class="matrix-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="ConnectedModule.fill(1)">1</button>
+                    <button class="btn btn-secondary" onclick="ConnectedModule.fill(0)">0</button>
+                    <button class="btn btn-danger" onclick="ConnectedModule.fill('')">C</button>
+                    <button class="btn btn-secondary" onclick="ConnectedModule.resize(1)">+</button>
+                    <button class="btn btn-secondary" onclick="ConnectedModule.resize(-1)">−</button>
+                    <button class="btn btn-primary" onclick="ConnectedModule.compute()">Aceptar</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Resultado</div>
+                <div id="connected-result" class="matrix-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+            </div>
+        </div>
+
+        <!-- ====== GAME THEORY ====== -->
+        <div class="module" id="mod-games">
+            <div class="module-header">
+                <div class="module-title">Teoría de Juegos</div>
+                <div class="module-desc">Encuentra equilibrios de Nash en estrategias puras para juegos bimatriciales.</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Matriz de Pagos</div>
+                <div style="overflow-x: auto;">
+                    <table class="game-table" id="game-table"></table>
+                </div>
+                <div class="spacer"></div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="GamesModule.resize(1)">+</button>
+                    <button class="btn btn-secondary" onclick="GamesModule.resize(-1)">−</button>
+                    <button class="btn btn-primary" onclick="GamesModule.compute()">Aceptar</button>
+                </div>
+                <div class="spacer"></div>
+                <div class="result-box" id="games-result">Equilibrio de Nash: —</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+// ===== NAVIGATION =====
+document.querySelectorAll('.sidebar-item[data-module]').forEach(item => {
+    item.addEventListener('click', (e) => {
+        // Skip if it's an external link
+        if (item.classList.contains('sidebar-link')) return;
+        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+        document.getElementById('mod-' + item.dataset.module).classList.add('active');
+    });
+});
+
+// ===== UTILITY: Build matrix grid =====
+function buildMatrixGrid(containerId, size, cssClass) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    el.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    for (let i = 0; i < size * size; i++) {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = cssClass || '';
+        el.appendChild(inp);
+    }
+    return el;
+}
+function getMatrixValues(containerId, size) {
+    const inputs = document.getElementById(containerId).querySelectorAll('input');
+    const m = [];
+    let k = 0;
+    for (let i = 0; i < size; i++) {
+        m[i] = [];
+        for (let j = 0; j < size; j++) {
+            m[i][j] = parseInt(inputs[k++].value) || 0;
+        }
+    }
+    return m;
+}
+function setMatrixResult(containerId, matrix, size) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    el.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.readOnly = true;
+            inp.value = matrix[i][j];
+            inp.style.background = 'var(--accent-glow)';
+            inp.style.color = 'var(--accent-light)';
+            inp.style.fontWeight = '600';
+            el.appendChild(inp);
+        }
+    }
+}
+
+// ===== HISTOGRAM DRAWING =====
+function drawHistogram(canvasId, data) {
+    const canvas = document.getElementById(canvasId);
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartW = w - pad.left - pad.right;
+    const chartH = h - pad.top - pad.bottom;
+    const max = Math.max(...data, 1);
+    const barW = chartW / data.length * 0.7;
+    const gap = chartW / data.length * 0.3;
+
+    // Axes
+    ctx.strokeStyle = '#2a2a3a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, pad.top + chartH);
+    ctx.lineTo(pad.left + chartW, pad.top + chartH);
+    ctx.stroke();
+
+    // Grid lines
+    ctx.strokeStyle = '#1a1a24';
+    for (let i = 0; i < 5; i++) {
+        const y = pad.top + chartH * i / 4;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(pad.left + chartW, y);
+        ctx.stroke();
+    }
+
+    // Bars
+    const gradient = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+    gradient.addColorStop(0, '#a29bfe');
+    gradient.addColorStop(1, '#6c5ce7');
+
+    data.forEach((val, i) => {
+        const barH = (val / max) * chartH;
+        const x = pad.left + i * (barW + gap) + gap / 2;
+        const y = pad.top + chartH - barH;
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        const r = Math.min(4, barW / 4);
+        ctx.moveTo(x, y + r);
+        ctx.arcTo(x, y, x + r, y, r);
+        ctx.arcTo(x + barW, y, x + barW, y + r, r);
+        ctx.lineTo(x + barW, pad.top + chartH);
+        ctx.lineTo(x, pad.top + chartH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Value label
+        ctx.fillStyle = '#a29bfe';
+        ctx.font = '600 11px "JetBrains Mono"';
+        ctx.textAlign = 'center';
+        if (val > 0) ctx.fillText(val, x + barW / 2, y - 6);
+
+        // X label
+        ctx.fillStyle = '#555568';
+        ctx.font = '500 11px "JetBrains Mono"';
+        ctx.fillText(i, x + barW / 2, pad.top + chartH + 18);
+    });
+}
+
+// ===== EXPANSION MODULE =====
+const ExpansionModule = {
+    clear() {
+        for (let i = 0; i < 8; i++) document.getElementById('exp-' + i).value = '';
+        const canvas = document.getElementById('canvas-expansion');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    compute() {
+        const num = [];
+        for (let i = 0; i < 8; i++) num.push(parseInt(document.getElementById('exp-' + i).value) || 0);
+        const minimo = parseInt(document.getElementById('exp-min').value) || 0;
+        const maximo = parseInt(document.getElementById('exp-max').value) || 7;
+
+        let min = -1, max = -1;
+        for (let i = 0; i < num.length; i++) if (num[i] !== 0) { min = i; break; }
+        for (let i = num.length - 1; i >= 0; i--) if (num[i] !== 0) { max = i; break; }
+
+        const resultado = [0, 0, 0, 0, 0, 0, 0, 0];
+        if (min !== -1 && max !== -1 && max !== min) {
+            for (let i = min; i <= max; i++) {
+                let pos = Math.round(((maximo - minimo) * (i - min)) / (max - min) + minimo);
+                pos = Math.max(0, Math.min(7, pos));
+                resultado[pos] += num[i];
+            }
+        } else if (min !== -1) {
+            resultado[minimo] = num[min];
+        }
+        drawHistogram('canvas-expansion', resultado);
+    }
+};
+
+// ===== EQUALIZATION MODULE =====
+const EqualizationModule = {
+    clear() {
+        for (let i = 0; i < 8; i++) document.getElementById('eq-' + i).value = '';
+        const canvas = document.getElementById('canvas-equalization');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    compute() {
+        const num = [];
+        for (let i = 0; i < 8; i++) num.push(parseInt(document.getElementById('eq-' + i).value) || 0);
+
+        let total = 0;
+        for (let i = 0; i < 8; i++) total += num[i];
+        if (total === 0) return;
+
+        const prob = num.map(v => v / total);
+        const cdf = [];
+        let acc = 0;
+        for (let i = 0; i < 8; i++) { acc += prob[i]; cdf.push(acc); }
+
+        const resultado = [0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < 8; i++) {
+            const d = Math.round(cdf[i] * 7);
+            resultado[d] += num[i];
+        }
+        drawHistogram('canvas-equalization', resultado);
+    }
+};
+
+// ===== FILTER CONVOLUTION (shared logic) =====
+function applyConvolution(matrix, mask, size) {
+    const aux = Array.from({length: size}, () => Array(size).fill(0));
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            for (let di = -1; di <= 1; di++) {
+                for (let dj = -1; dj <= 1; dj++) {
+                    const ni = i + di, nj = j + dj;
+                    if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
+                        aux[i][j] += matrix[ni][nj] * mask[di + 1][dj + 1];
+                    }
+                }
+            }
+        }
+    }
+    return aux;
+}
+
+// ===== LAPLACIAN MODULE =====
+const LaplacianModule = (() => {
+    let size = 3;
+    let maskIdx = 0;
+    const masks = [
+        [0,-1,0,-1,4,-1,0,-1,0],
+        [0,1,0,1,-4,1,0,1,0],
+        [1,1,1,1,-8,1,1,1,1],
+        [-1,-1,-1,-1,8,-1,-1,-1,-1]
+    ];
+    function init() {
+        buildMatrixGrid('laplacian-matrix', size);
+        buildMask();
+    }
+    function buildMask() {
+        const el = document.getElementById('laplacian-mask');
+        el.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.value = masks[maskIdx][i];
+            el.appendChild(inp);
+        }
+    }
+    init();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 5) return;
+            size = ns;
+            buildMatrixGrid('laplacian-matrix', size);
+        },
+        clearMatrix() {
+            document.getElementById('laplacian-matrix').querySelectorAll('input').forEach(i => i.value = '');
+        },
+        clearMask() {
+            document.getElementById('laplacian-mask').querySelectorAll('input').forEach(i => i.value = '');
+        },
+        nextMask() { maskIdx = (maskIdx + 1) % masks.length; buildMask(); },
+        prevMask() { maskIdx = (maskIdx - 1 + masks.length) % masks.length; buildMask(); },
+        compute() {
+            const matrix = getMatrixValues('laplacian-matrix', size);
+            const maskInputs = document.getElementById('laplacian-mask').querySelectorAll('input');
+            const mask = [];
+            let k = 0;
+            for (let i = 0; i < 3; i++) { mask[i] = []; for (let j = 0; j < 3; j++) mask[i][j] = parseInt(maskInputs[k++].value) || 0; }
+
+            let aux = applyConvolution(matrix, mask, size);
+
+            // Normalize to 0-7
+            let min = Infinity, max = -Infinity;
+            for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) {
+                if (aux[i][j] < min) min = aux[i][j];
+                if (aux[i][j] > max) max = aux[i][j];
+            }
+            const range = max - min || 1;
+            for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) {
+                aux[i][j] = Math.round((7 / range) * (aux[i][j] - min));
+            }
+            setMatrixResult('laplacian-result', aux, size);
+        }
+    };
+})();
+
+// ===== MEAN FILTER MODULE =====
+const MeanModule = (() => {
+    let size = 3;
+    let maskIdx = 0;
+    const masks = [
+        [1,1,1,1,1,1,1,1,1],
+        [1,2,1,2,4,2,1,2,1]
+    ];
+    function init() {
+        buildMatrixGrid('mean-matrix', size);
+        buildMask();
+    }
+    function buildMask() {
+        const el = document.getElementById('mean-mask');
+        el.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.value = masks[maskIdx][i];
+            el.appendChild(inp);
+        }
+    }
+    init();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 5) return;
+            size = ns;
+            buildMatrixGrid('mean-matrix', size);
+        },
+        clearMatrix() {
+            document.getElementById('mean-matrix').querySelectorAll('input').forEach(i => i.value = '');
+        },
+        clearMask() {
+            document.getElementById('mean-mask').querySelectorAll('input').forEach(i => i.value = '');
+        },
+        nextMask() { maskIdx = (maskIdx + 1) % masks.length; buildMask(); },
+        prevMask() { maskIdx = (maskIdx - 1 + masks.length) % masks.length; buildMask(); },
+        compute() {
+            const matrix = getMatrixValues('mean-matrix', size);
+            const maskInputs = document.getElementById('mean-mask').querySelectorAll('input');
+            const mask = [];
+            let k = 0, sum = 0;
+            for (let i = 0; i < 3; i++) { mask[i] = []; for (let j = 0; j < 3; j++) { mask[i][j] = parseInt(maskInputs[k++].value) || 0; sum += mask[i][j]; } }
+            if (sum === 0) sum = 1;
+
+            let aux = applyConvolution(matrix, mask, size);
+            for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) {
+                aux[i][j] = Math.round(aux[i][j] / sum);
+            }
+            setMatrixResult('mean-result', aux, size);
+        }
+    };
+})();
+
+// ===== MEDIAN FILTER MODULE =====
+const MedianModule = (() => {
+    let size = 3;
+    function init() { buildMatrixGrid('median-matrix', size); }
+    init();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 6) return;
+            size = ns;
+            buildMatrixGrid('median-matrix', size);
+        },
+        clearMatrix() {
+            document.getElementById('median-matrix').querySelectorAll('input').forEach(i => i.value = '');
+        },
+        compute() {
+            const matrix = getMatrixValues('median-matrix', size);
+            const result = Array.from({length: size}, () => Array(size).fill(0));
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    const neighbors = [];
+                    for (let di = -1; di <= 1; di++) {
+                        for (let dj = -1; dj <= 1; dj++) {
+                            const ni = i + di, nj = j + dj;
+                            if (ni >= 0 && ni < size && nj >= 0 && nj < size) {
+                                const v = matrix[ni][nj];
+                                if (!isNaN(v)) neighbors.push(v);
+                            }
+                        }
+                    }
+                    neighbors.sort((a, b) => a - b);
+                    const len = neighbors.length;
+                    if (len % 2 === 0) {
+                        result[i][j] = Math.round((neighbors[len/2 - 1] + neighbors[len/2]) / 2);
+                    } else {
+                        result[i][j] = neighbors[Math.floor(len/2)];
+                    }
+                }
+            }
+            setMatrixResult('median-result', result, size);
+        }
+    };
+})();
+
+// ===== CONGRUENCE MODULE =====
+const CongruenceModule = {
+    clear() {
+        ['cong-a','cong-b','cong-n'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('cong-result').textContent = '—';
+        for (let i = 1; i <= 5; i++) document.getElementById('cong-s' + i).textContent = '';
+    },
+    compute() {
+        let a = parseInt(document.getElementById('cong-a').value);
+        let b = parseInt(document.getElementById('cong-b').value);
+        const n = parseInt(document.getElementById('cong-n').value);
+        if (isNaN(a) || isNaN(b) || isNaN(n) || n === 0) return;
+
+        const origA = a, origB = b;
+        if (a > n) a = a % n;
+        if (b > n) b = b % n;
+
+        let inv = -1;
+        for (let i = 1; i < n * 2; i++) {
+            if ((a * i) % n === 1 % n || (a * i - 1) % n === 0) { inv = i; break; }
+        }
+
+        const el = (id) => document.getElementById(id);
+        if (inv !== -1) {
+            const x = (inv * b) % n;
+            el('cong-result').textContent = `X = ${x}   →   X = ${x} + ${n}K`;
+            el('cong-s1').textContent = `${origA}x ≡ ${origB} (mod ${n})`;
+            el('cong-s2').textContent = (origA !== a || origB !== b) ? `${a}x ≡ ${b} (mod ${n})` : '';
+            el('cong-s3').textContent = `Multiplicar por inverso: (${inv})·${a}x ≡ (${inv})·${b} (mod ${n})`;
+            el('cong-s4').textContent = `${inv * a}x ≡ ${inv * b} (mod ${n})`;
+            el('cong-s5').textContent = `x ≡ ${(inv * b) % n} (mod ${n})`;
+        } else {
+            el('cong-result').textContent = 'No existe solución (no hay inverso modular)';
+            for (let i = 1; i <= 5; i++) el('cong-s' + i).textContent = '';
+        }
+    }
+};
+
+// ===== RSA MODULE (with modular exponentiation fix) =====
+const RSAModule = (() => {
+    let n = 0, euler = 0, d = 0, e_val = 0;
+
+    // FIX: Modular exponentiation to avoid integer overflow
+    function modPow(base, exp, mod) {
+        let result = 1n;
+        base = BigInt(base) % BigInt(mod);
+        exp = BigInt(exp);
+        const m = BigInt(mod);
+        while (exp > 0n) {
+            if (exp % 2n === 1n) result = (result * base) % m;
+            exp = exp / 2n;
+            base = (base * base) % m;
+        }
+        return Number(result);
+    }
+
+    return {
+        generatePrimes() {
+            const p = parseInt(document.getElementById('rsa-p').value);
+            const q = parseInt(document.getElementById('rsa-q').value);
+            if (isNaN(p) || isNaN(q)) return;
+            n = p * q;
+            euler = (p - 1) * (q - 1);
+
+            const container = document.getElementById('rsa-primes-list');
+            container.innerHTML = '';
+            for (let k = 2; k < euler; k++) {
+                let coprime = true;
+                for (let i = 2; i <= Math.sqrt(Math.max(k, euler)); i++) {
+                    if (k % i === 0 && euler % i === 0) { coprime = false; break; }
+                }
+                if (coprime) {
+                    const el = document.createElement('div');
+                    el.className = 'rsa-prime-item';
+                    el.textContent = k;
+                    el.addEventListener('click', () => {
+                        container.querySelectorAll('.rsa-prime-item').forEach(i => i.classList.remove('selected'));
+                        el.classList.add('selected');
+                        RSAModule.generateKeys(k);
+                    });
+                    container.appendChild(el);
+                }
+            }
+        },
+        generateKeys(dVal) {
+            d = dVal;
+            // Find e such that d*e ≡ 1 (mod euler)
+            e_val = 0;
+            for (let i = 2; i < euler * 2; i++) {
+                if ((d * i) % euler === 1) { e_val = i; break; }
+            }
+            document.getElementById('rsa-private').textContent = `(${n}, ${d})`;
+            document.getElementById('rsa-public').textContent = `(${n}, ${e_val})`;
+        },
+        compute() {
+            const isEncrypt = document.getElementById('rsa-encrypt').checked;
+            const isDecrypt = document.getElementById('rsa-decrypt').checked;
+            if (!isEncrypt && !isDecrypt) { alert('Seleccione Encriptar o Desencriptar'); return; }
+            const val = parseInt(document.getElementById('rsa-value').value);
+            if (isNaN(val) || n === 0) return;
+
+            const exp = isEncrypt ? e_val : d;
+            const result = modPow(val, exp, n);
+            document.getElementById('rsa-result').textContent = `Resultado: ${result}`;
+        }
+    };
+})();
+
+// ===== PATH MATRIX MODULE =====
+const PathsModule = (() => {
+    let size = 3;
+    function init() { buildMatrixGrid('paths-matrix', size); }
+    init();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 7) return;
+            size = ns;
+            buildMatrixGrid('paths-matrix', size);
+        },
+        fill(v) {
+            document.getElementById('paths-matrix').querySelectorAll('input').forEach(i => i.value = v);
+        },
+        compute() {
+            // FIX: Use parseInt consistently and fix the reachability algorithm
+            const matrix = getMatrixValues('paths-matrix', size);
+            const worked = Array.from({length: size}, () => Array(size).fill(false));
+
+            for (let i = 0; i < size; i++) {
+                let changed = true;
+                while (changed) {
+                    changed = false;
+                    for (let j = 0; j < size; j++) {
+                        if (matrix[i][j] === 1 && !worked[i][j]) {
+                            worked[i][j] = true;
+                            changed = true;
+                            for (let k = 0; k < size; k++) {
+                                if (matrix[j][k] === 1 && matrix[i][k] !== 1) {
+                                    matrix[i][k] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            setMatrixResult('paths-result', matrix, size);
+        }
+    };
+})();
+
+// ===== CONNECTED COMPONENTS MODULE =====
+const ConnectedModule = (() => {
+    let size = 4;
+    function init() { buildMatrixGrid('connected-matrix', size); }
+    init();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 6) return;
+            size = ns;
+            buildMatrixGrid('connected-matrix', size);
+            document.getElementById('connected-result').innerHTML = '';
+            document.getElementById('connected-result').style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        },
+        fill(v) {
+            document.getElementById('connected-matrix').querySelectorAll('input').forEach(i => i.value = v);
+        },
+        compute() {
+            const matrix = getMatrixValues('connected-matrix', size);
+            // FIX: Use proper bracket notation (was using comma operator)
+            const worked = Array.from({length: size}, () => Array(size).fill(false));
+
+            for (let i = 0; i < size; i++) {
+                let changed = true;
+                while (changed) {
+                    changed = false;
+                    for (let j = 0; j < size; j++) {
+                        if (matrix[i][j] === 1 && !worked[i][j]) {
+                            worked[i][j] = true;
+                            changed = true;
+                            for (let k = 0; k < size; k++) {
+                                if (matrix[j][k] === 1 && matrix[i][k] !== 1) {
+                                    matrix[i][k] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Sort rows/cols by connectivity count
+            const rowCounts = matrix.map(row => row.reduce((s, v) => s + v, 0));
+            const indices = Array.from({length: size}, (_, i) => i);
+            indices.sort((a, b) => rowCounts[b] - rowCounts[a]);
+
+            const sorted = Array.from({length: size}, () => Array(size).fill(0));
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    sorted[i][j] = matrix[indices[i]][indices[j]];
+                }
+            }
+            setMatrixResult('connected-result', sorted, size);
+        }
+    };
+})();
+
+// ===== GAME THEORY MODULE =====
+const GamesModule = (() => {
+    let size = 2;
+    const labels = ['A', 'B', 'C'];
+    function buildTable() {
+        const table = document.getElementById('game-table');
+        table.innerHTML = '';
+        // Header
+        const thead = document.createElement('thead');
+        const hrow = document.createElement('tr');
+        hrow.innerHTML = '<th class="corner"></th>';
+        for (let j = 0; j < size; j++) hrow.innerHTML += `<th>${labels[j]}</th>`;
+        thead.appendChild(hrow);
+        table.appendChild(thead);
+        // Body
+        const tbody = document.createElement('tbody');
+        for (let i = 0; i < size; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<th>${labels[i]}</th>`;
+            for (let j = 0; j < size; j++) {
+                row.innerHTML += `<td><input type="text" class="gv">,<input type="text" class="gv"></td>`;
+            }
+            tbody.appendChild(row);
+        }
+        table.appendChild(tbody);
+    }
+    buildTable();
+    return {
+        resize(d) {
+            const ns = size + d;
+            if (ns < 2 || ns > 3) return;
+            size = ns;
+            buildTable();
+        },
+        compute() {
+            const inputs = document.querySelectorAll('.gv');
+            // Build payoff matrices for both players
+            // Each cell has 2 inputs: player1, player2
+            const p1 = Array.from({length: size}, () => Array(size).fill(0));
+            const p2 = Array.from({length: size}, () => Array(size).fill(0));
+            let k = 0;
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    p1[i][j] = parseInt(inputs[k++].value) || 0;
+                    p2[i][j] = parseInt(inputs[k++].value) || 0;
+                }
+            }
+
+            // Find Nash equilibria (pure strategies)
+            // Cell (i,j) is NE if:
+            //   p1[i][j] >= p1[r][j] for all r (player 1 best response given col j)
+            //   p2[i][j] >= p2[i][c] for all c (player 2 best response given row i)
+            const nash = [];
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    let isBR1 = true, isBR2 = true;
+                    for (let r = 0; r < size; r++) {
+                        if (p1[r][j] > p1[i][j]) { isBR1 = false; break; }
+                    }
+                    for (let c = 0; c < size; c++) {
+                        if (p2[i][c] > p2[i][j]) { isBR2 = false; break; }
+                    }
+                    if (isBR1 && isBR2) nash.push(`(${labels[i]}, ${labels[j]})`);
+                }
+            }
+
+            const result = nash.length > 0
+                ? `Equilibrio de Nash: ${nash.join('  ')}`
+                : 'No se encontró equilibrio de Nash en estrategias puras';
+            document.getElementById('games-result').textContent = result;
+        }
+    };
+})();
+</script>
+</body>
 </html>

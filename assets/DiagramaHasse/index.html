@@ -1,81 +1,713 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <title>Diagrama Hasse</title>
-</head>
+    <title>Diagrama de Hasse</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a24;
+            --surface-3: #22222e;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --text-muted: #555568;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.15);
+            --accent-glow-strong: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --success-glow: rgba(0, 206, 201, 0.15);
+            --warning: #fdcb6e;
+            --danger: #ff6b6b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
+        /* Navbar */
+        .navbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; height: 56px;
+            background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0;
+        }
+        .navbar-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700; font-size: 0.95rem; color: var(--text); text-decoration: none;
+        }
+        .brand-icon {
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: white; font-weight: 700;
+        }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .badge {
+            padding: 4px 10px; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 20px; font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim);
+        }
+        .back-link {
+            color: var(--text-dim); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+            padding: 6px 14px; border-radius: var(--radius-xs); transition: all 0.2s;
+        }
+        .back-link:hover { color: var(--text); background: var(--surface-2); }
+
+        /* Layout */
+        .main-wrapper {
+            flex: 1; overflow-y: auto; padding: 24px 28px;
+            display: flex; gap: 20px; min-height: 0;
+        }
+        .main-wrapper::-webkit-scrollbar { width: 6px; }
+        .main-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .col-left { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+        .col-right { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px;
+        }
+        .card-title {
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 14px;
+        }
+
+        /* Matrix grid */
+        .matrix-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .matrix-grid {
+            display: inline-grid; gap: 3px; padding: 10px;
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+        }
+        .matrix-grid input {
+            width: 44px; height: 38px; text-align: center;
+            font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
+            background: var(--surface-3); border: 1px solid var(--border);
+            border-radius: var(--radius-xs); color: var(--text); outline: none;
+            transition: all 0.15s;
+        }
+        .matrix-grid input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        /* Row/col labels */
+        .matrix-labels {
+            display: inline-grid; gap: 3px; padding: 10px;
+        }
+        .matrix-label {
+            width: 44px; height: 38px; display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 0.78rem; font-weight: 600; color: var(--accent-light);
+        }
+        .matrix-with-labels { display: flex; align-items: flex-start; }
+        .col-labels-row {
+            display: flex; gap: 3px; padding: 0 10px; margin-bottom: 2px;
+            margin-left: 44px; /* offset for row labels */
+        }
+        .col-label {
+            width: 44px; text-align: center;
+            font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: var(--accent-light);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 8px 16px; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+            border: none; border-radius: var(--radius-xs); cursor: pointer;
+            transition: all 0.15s; user-select: none;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #5b4bd6; box-shadow: 0 2px 12px var(--accent-glow-strong); }
+        .btn-secondary { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+        .btn-danger { background: rgba(255,107,107,0.12); color: var(--danger); border: 1px solid rgba(255,107,107,0.2); }
+        .btn-danger:hover { background: rgba(255,107,107,0.2); }
+        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+
+        /* Properties */
+        .properties-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+        }
+        .prop-card {
+            padding: 12px; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); text-align: center;
+        }
+        .prop-label {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .prop-value {
+            font-family: var(--mono); font-size: 0.88rem; font-weight: 700; color: var(--text-dim);
+        }
+        .prop-value.yes { color: var(--success); }
+        .prop-value.no { color: var(--danger); }
+
+        /* Hasse reduced matrix */
+        .reduced-matrix {
+            display: inline-grid; gap: 2px; padding: 8px;
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+        }
+        .reduced-cell {
+            width: 32px; height: 28px; display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+            border-radius: 4px;
+        }
+        .reduced-cell.one { color: var(--accent-light); background: var(--accent-glow); }
+        .reduced-cell.zero { color: var(--text-muted); }
+
+        /* Set notation */
+        .set-notation {
+            padding: 10px 14px; background: var(--accent-glow);
+            border: 1px solid rgba(108,92,231,0.2); border-radius: var(--radius-sm);
+            font-family: var(--mono); font-size: 0.82rem; color: var(--accent-light);
+            font-weight: 600; text-align: center;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        }
+        .status-badge.valid {
+            background: var(--success-glow); color: var(--success);
+            border: 1px solid rgba(0,206,201,0.3);
+        }
+        .status-badge.invalid {
+            background: rgba(255,107,107,0.12); color: var(--danger);
+            border: 1px solid rgba(255,107,107,0.3);
+        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        /* Canvas card */
+        .canvas-card {
+            flex: 1; min-height: 200px; display: flex; flex-direction: column;
+        }
+        .canvas-wrapper {
+            flex: 1; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 200px; position: relative;
+        }
+        .canvas-wrapper canvas { display: block; }
+        .canvas-placeholder {
+            color: var(--text-muted); font-size: 0.85rem;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .canvas-placeholder .icon { font-size: 2rem; opacity: 0.4; }
+
+        /* View toggle */
+        .view-toggle {
+            display: flex; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-xs); overflow: hidden;
+        }
+        .view-toggle button {
+            flex: 1; padding: 7px 14px; font-family: var(--font); font-size: 0.78rem;
+            font-weight: 600; background: transparent; border: none;
+            color: var(--text-dim); cursor: pointer; transition: all 0.15s;
+        }
+        .view-toggle button:hover { color: var(--text); }
+        .view-toggle button.active { background: var(--accent); color: white; }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease; }
+
+        @media (max-width: 800px) {
+            .main-wrapper { flex-direction: column; }
+            .col-left { width: 100%; }
+        }
+    </style>
+</head>
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <div class="d-flex">
-            <img src="matriz.png" alt="matriz" width="50" class="ms-3">
-            <a href="#" class="ms-3 navbar-brand">DIAGRAMA DE HASSE : Matriz de relación</a>
+
+<nav class="navbar">
+    <a href="#" class="navbar-brand" onclick="history.back(); return false;">
+        <div class="brand-icon">◇</div>
+        Diagrama de Hasse
+    </a>
+    <div class="nav-right">
+        <span class="badge" id="size-badge">3 × 3</span>
+        <a href="#" class="back-link" onclick="history.back(); return false;">← Volver</a>
+    </div>
+</nav>
+
+<div class="main-wrapper">
+
+    <!-- Left column: Matrix input -->
+    <div class="col-left">
+        <div class="card">
+            <div class="card-title">Matriz de Relación</div>
+            <div class="set-notation" id="set-notation">A = { a, b, c }</div>
+            <div style="height: 12px;"></div>
+
+            <!-- Column labels -->
+            <div id="col-labels" class="col-labels-row"></div>
+            <!-- Row labels + matrix -->
+            <div class="matrix-with-labels">
+                <div id="row-labels" class="matrix-labels"></div>
+                <div id="matrix-grid" class="matrix-grid"></div>
+            </div>
+
+            <div style="height: 12px;"></div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="resizeMatrix(-1)">−</button>
+                <button class="btn btn-secondary" onclick="resizeMatrix(1)">+</button>
+                <button class="btn btn-secondary" onclick="fillAll(1)">1</button>
+                <button class="btn btn-secondary" onclick="fillAll(0)">0</button>
+                <button class="btn btn-danger" onclick="clearAll()">C</button>
+                <button class="btn btn-primary" onclick="computeResult()">Aceptar</button>
+            </div>
         </div>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="mt-4 d-flex flex-column align-content-center">
-                    <div class="cj-matriz mb-2 border border-dark bg-light">
-                    </div>
-                    <div class="botones text-center">
-                        <button class="btn btn-primary" onclick="cambiarTamanio('-')">-</button>
-                        <button class="btn btn-warning" onclick="cambiarTamanio('+')">+</button>
-                        <button class="btn btn-success" onclick="resultado()">ACEPTAR</button>
-                        <button class="btn btn-danger" onclick="limpiar()">C</button>
-                    </div>
+
+        <!-- Properties -->
+        <div class="card" id="props-card" style="display: none;">
+            <div class="card-title">Propiedades de Orden Parcial</div>
+            <div class="properties-grid">
+                <div class="prop-card">
+                    <div class="prop-label">Reflexiva</div>
+                    <div class="prop-value" id="prop-reflex">—</div>
                 </div>
-                <div class="mt-5">
-                    <button class="btn btn-primary btn-mostrar" onclick="mostrar()">mostrar diagrama</button>
-                    <button class="btn btn-warning" onclick="llenar(1)">1</button>
-                    <button class="btn btn-dark" onclick="llenar(0)">0</button>
-                    <canvas class="canvas mt-2 mb-3"></canvas>
+                <div class="prop-card">
+                    <div class="prop-label">Transitiva</div>
+                    <div class="prop-value" id="prop-trans">—</div>
+                </div>
+                <div class="prop-card">
+                    <div class="prop-label">Antisimétrica</div>
+                    <div class="prop-value" id="prop-antis">—</div>
                 </div>
             </div>
-            <div class="col">
-                <div class="card mt-4">
-                    <div class="card-header notacion">
-                        Resultados
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th scope="col">Reflexiva</th>
-                                <th scope="col">Transitiva</th>
-                                <th scope="col">Antisimetrica</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>                              
-                                <td class="reflex">-</td>
-                                <td class="trans">-</td>
-                                <td class="antis">-</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                    </div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        Diagrama de Hasse desde la matriz de relación
-                    </div>
-                    <div class="card-body resultado">
-                    </div>
-                </div>
+            <div style="height: 10px;"></div>
+            <div style="text-align: center;">
+                <span class="status-badge" id="status-badge">
+                    <span class="status-dot"></span>
+                    <span id="status-text">—</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Reduced matrix -->
+        <div class="card" id="reduced-card" style="display: none;">
+            <div class="card-title">Matriz Reducida de Hasse</div>
+            <div style="display: flex; justify-content: center;">
+                <div id="reduced-matrix" class="reduced-matrix"></div>
             </div>
         </div>
     </div>
 
+    <!-- Right column: Diagram -->
+    <div class="col-right">
+        <div class="card canvas-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                <div class="card-title" style="margin-bottom: 0;">Diagrama de Hasse</div>
+            </div>
+            <div class="canvas-wrapper" id="canvas-wrapper">
+                <canvas id="hasse-canvas"></canvas>
+                <div class="canvas-placeholder" id="placeholder">
+                    <div class="icon">◇</div>
+                    <div>Ingrese una matriz de relación y presione <strong>Aceptar</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script src="./js/bootstrap.bundle.min.js"></script>
-    <script src="./js/jquery.js"></script>
-    <script src="./js/main.js"></script>
+<script>
+// ===== STATE =====
+const LABELS = ['a','b','c','d','e','f','g','h','i','j'];
+let size = 3;
+
+// ===== MATRIX UI =====
+function buildMatrix() {
+    const grid = document.getElementById('matrix-grid');
+    const rowLabels = document.getElementById('row-labels');
+    const colLabels = document.getElementById('col-labels');
+    grid.innerHTML = '';
+    rowLabels.innerHTML = '';
+    colLabels.innerHTML = '';
+
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    rowLabels.style.gridTemplateColumns = '1fr';
+
+    // Col labels
+    for (let j = 0; j < size; j++) {
+        const div = document.createElement('div');
+        div.className = 'col-label';
+        div.textContent = LABELS[j];
+        colLabels.appendChild(div);
+    }
+    // Adjust col labels margin
+    colLabels.style.marginLeft = '54px';
+
+    // Row labels + inputs
+    for (let i = 0; i < size; i++) {
+        const lbl = document.createElement('div');
+        lbl.className = 'matrix-label';
+        lbl.textContent = LABELS[i];
+        rowLabels.appendChild(lbl);
+
+        for (let j = 0; j < size; j++) {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.maxLength = 1;
+            inp.dataset.row = i;
+            inp.dataset.col = j;
+            // Quick input: typing 0 or 1 auto-advances
+            inp.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val === '0' || val === '1') {
+                    // Move to next input
+                    const next = e.target.nextElementSibling ||
+                        (e.target.parentElement.children[Array.from(e.target.parentElement.children).indexOf(e.target) + 1]);
+                    const allInputs = grid.querySelectorAll('input');
+                    const idx = Array.from(allInputs).indexOf(e.target);
+                    if (idx + 1 < allInputs.length) allInputs[idx + 1].focus();
+                }
+            });
+            grid.appendChild(inp);
+        }
+    }
+
+    updateNotation();
+    document.getElementById('size-badge').textContent = `${size} × ${size}`;
+}
+
+function updateNotation() {
+    const items = LABELS.slice(0, size).join(', ');
+    document.getElementById('set-notation').textContent = `A = { ${items} }`;
+}
+
+function resizeMatrix(d) {
+    // Save values
+    const inputs = document.getElementById('matrix-grid').querySelectorAll('input');
+    const saved = [];
+    let k = 0;
+    for (let i = 0; i < size; i++) {
+        saved[i] = [];
+        for (let j = 0; j < size; j++) {
+            saved[i][j] = inputs[k++].value;
+        }
+    }
+
+    const ns = size + d;
+    if (ns < 2 || ns > 10) return;
+    size = ns;
+    buildMatrix();
+
+    // Restore
+    const newInputs = document.getElementById('matrix-grid').querySelectorAll('input');
+    let idx = 0;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (i < saved.length && j < (saved[i] || []).length) {
+                newInputs[idx].value = saved[i][j];
+            }
+            idx++;
+        }
+    }
+}
+
+function fillAll(v) {
+    document.getElementById('matrix-grid').querySelectorAll('input').forEach(i => i.value = v);
+}
+
+function clearAll() {
+    document.getElementById('matrix-grid').querySelectorAll('input').forEach(i => i.value = '');
+    document.getElementById('props-card').style.display = 'none';
+    document.getElementById('reduced-card').style.display = 'none';
+    document.getElementById('placeholder').style.display = '';
+    const canvas = document.getElementById('hasse-canvas');
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function getMatrix() {
+    const inputs = document.getElementById('matrix-grid').querySelectorAll('input');
+    const m = [];
+    let k = 0;
+    for (let i = 0; i < size; i++) {
+        m[i] = [];
+        for (let j = 0; j < size; j++) {
+            m[i][j] = parseInt(inputs[k++].value) || 0;
+        }
+    }
+    return m;
+}
+
+// ===== PROPERTIES =====
+function checkReflexive(m) {
+    for (let i = 0; i < size; i++) if (m[i][i] !== 1) return false;
+    return true;
+}
+
+function checkAntisymmetric(m) {
+    for (let i = 0; i < size; i++)
+        for (let j = 0; j < size; j++)
+            if (i !== j && m[i][j] === 1 && m[j][i] === 1) return false;
+    return true;
+}
+
+function checkTransitive(m) {
+    for (let i = 0; i < size; i++)
+        for (let j = 0; j < size; j++)
+            for (let k = 0; k < size; k++)
+                if (m[i][j] === 1 && m[j][k] === 1 && m[i][k] !== 1) return false;
+    return true;
+}
+
+// ===== HASSE REDUCTION =====
+function computeHasseMatrix(m) {
+    // Copy & remove diagonal
+    const h = m.map(row => [...row]);
+    for (let i = 0; i < size; i++) h[i][i] = 0;
+
+    // Remove transitive edges: if h[i][k]=1 and h[k][j]=1, remove h[i][j]
+    for (let i = 0; i < size; i++)
+        for (let j = 0; j < size; j++)
+            for (let k = 0; k < size; k++)
+                if (k !== i && k !== j && h[i][k] === 1 && h[k][j] === 1)
+                    h[i][j] = 0;
+
+    return h;
+}
+
+// ===== DRAWING =====
+function drawHasse(hasseMatrix) {
+    const canvas = document.getElementById('hasse-canvas');
+    const wrapper = document.getElementById('canvas-wrapper');
+    document.getElementById('placeholder').style.display = 'none';
+
+    // Compute levels using the Hasse matrix
+    // Level 1: nodes with no incoming edges in hasseMatrix
+    // (i.e., no j such that hasseMatrix[j][i] = 1... but actually we need:
+    //  nodes that are minimal = no column i has a 1 in hasseMatrix)
+    // Wait — hasseMatrix[i][j]=1 means i < j (i covers j? or j covers i?)
+    // In the original code: matriz[i][j]=1 means i is related to j.
+    // For Hasse: hasseMatrix[i][j]=1 means i directly covers j (or i < j directly)
+    // Actually looking at the original: rows that have NO 1s at all are at level 1 (minimal)
+    // Then from those, we go up
+
+    // Determine levels (BFS-like from bottom)
+    // Minimal elements: row i has all zeros in hasseMatrix
+    const levels = new Array(size).fill(0);
+    const visited = new Set();
+
+    // Find minimal: no outgoing edge in hasseMatrix (row is all 0)
+    // Wait let me re-read: in original code, hasseMatrix[i][j]=1 means i covers j
+    // Nodes with row all 0 → they don't cover anyone → they're minimal
+    const minimals = [];
+    for (let i = 0; i < size; i++) {
+        let isMinimal = true;
+        for (let j = 0; j < size; j++) {
+            if (hasseMatrix[i][j] === 1) { isMinimal = false; break; }
+        }
+        if (isMinimal) minimals.push(i);
+    }
+
+    // BFS upward
+    minimals.forEach(m => levels[m] = 1);
+    let queue = [...minimals];
+    const processed = new Set(minimals);
+
+    let maxIter = size * size;
+    while (queue.length > 0 && maxIter-- > 0) {
+        const next = [];
+        for (const node of queue) {
+            // Find nodes that cover this node: hasseMatrix[j][node]=1
+            for (let j = 0; j < size; j++) {
+                if (hasseMatrix[j][node] === 1 && !processed.has(j)) {
+                    // j covers node, so j is above node
+                    // But j might cover multiple nodes at different levels
+                    // j's level = max(level of all nodes j covers) + 1
+                    let maxChildLevel = 0;
+                    let allChildrenProcessed = true;
+                    for (let k = 0; k < size; k++) {
+                        if (hasseMatrix[j][k] === 1) {
+                            if (!processed.has(k)) { allChildrenProcessed = false; break; }
+                            maxChildLevel = Math.max(maxChildLevel, levels[k]);
+                        }
+                    }
+                    if (allChildrenProcessed) {
+                        levels[j] = maxChildLevel + 1;
+                        processed.add(j);
+                        next.push(j);
+                    }
+                }
+            }
+        }
+        queue = next;
+    }
+
+    // Handle unprocessed nodes (disconnected)
+    for (let i = 0; i < size; i++) {
+        if (!processed.has(i)) levels[i] = 1;
+    }
+
+    const maxLevel = Math.max(...levels);
+    const canvasW = wrapper.clientWidth;
+    const canvasH = Math.max(wrapper.clientHeight, (maxLevel + 1) * 70 + 40);
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    canvas.style.width = canvasW + 'px';
+    canvas.style.height = canvasH + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    // Dot grid
+    ctx.fillStyle = '#1a1a24';
+    for (let gx = 20; gx < canvasW; gx += 40)
+        for (let gy = 20; gy < canvasH; gy += 40) {
+            ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI * 2); ctx.fill();
+        }
+
+    // Position nodes: minimal at bottom, maximal at top
+    const positions = [];
+    for (let lv = 1; lv <= maxLevel; lv++) {
+        const nodesAtLevel = [];
+        for (let i = 0; i < size; i++) if (levels[i] === lv) nodesAtLevel.push(i);
+        const count = nodesAtLevel.length;
+        const dx = canvasW / (count + 1);
+        const y = canvasH - 40 - (lv - 1) * 65;
+        nodesAtLevel.forEach((node, idx) => {
+            positions[node] = { x: dx * (idx + 1), y };
+        });
+    }
+
+    // Draw edges
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (hasseMatrix[i][j] === 1 && positions[i] && positions[j]) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#3a3a50';
+                ctx.lineWidth = 1.8;
+                ctx.moveTo(positions[i].x, positions[i].y);
+                ctx.lineTo(positions[j].x, positions[j].y);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Draw nodes
+    const R = 18;
+    for (let i = 0; i < size; i++) {
+        if (!positions[i]) continue;
+        const { x, y } = positions[i];
+
+        // Shadow
+        ctx.beginPath();
+        ctx.arc(x, y + 2, R, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fill();
+
+        // Circle
+        ctx.beginPath();
+        ctx.arc(x, y, R, 0, Math.PI * 2);
+        ctx.fillStyle = '#1a1a24';
+        ctx.fill();
+        ctx.strokeStyle = '#6c5ce7';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = '#a29bfe';
+        ctx.font = '700 13px "JetBrains Mono"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(LABELS[i], x, y);
+    }
+}
+
+// ===== SHOW REDUCED MATRIX =====
+function showReducedMatrix(hasse) {
+    const container = document.getElementById('reduced-matrix');
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            const div = document.createElement('div');
+            div.className = `reduced-cell ${hasse[i][j] === 1 ? 'one' : 'zero'}`;
+            div.textContent = hasse[i][j];
+            container.appendChild(div);
+        }
+    }
+}
+
+// ===== MAIN =====
+function computeResult() {
+    // Validate
+    const inputs = document.getElementById('matrix-grid').querySelectorAll('input');
+    for (const inp of inputs) {
+        if (inp.value.trim() === '') { alert('Complete todos los campos'); return; }
+    }
+
+    const m = getMatrix();
+
+    // Check properties
+    const reflex = checkReflexive(m);
+    const antis = checkAntisymmetric(m);
+    const trans = checkTransitive(m);
+    const isPoset = reflex && antis && trans;
+
+    // Show properties
+    const propsCard = document.getElementById('props-card');
+    propsCard.style.display = '';
+    propsCard.classList.add('fade-in');
+
+    const setProp = (id, val) => {
+        const el = document.getElementById(id);
+        el.textContent = val ? 'SÍ' : 'NO';
+        el.className = `prop-value ${val ? 'yes' : 'no'}`;
+    };
+    setProp('prop-reflex', reflex);
+    setProp('prop-trans', trans);
+    setProp('prop-antis', antis);
+
+    const badge = document.getElementById('status-badge');
+    const statusText = document.getElementById('status-text');
+    if (isPoset) {
+        badge.className = 'status-badge valid';
+        statusText.textContent = 'Conjunto parcialmente ordenado';
+    } else {
+        badge.className = 'status-badge invalid';
+        statusText.textContent = 'No es un orden parcial';
+    }
+
+    // Compute and show Hasse
+    const hasse = computeHasseMatrix(m);
+
+    const reducedCard = document.getElementById('reduced-card');
+    reducedCard.style.display = '';
+    reducedCard.classList.add('fade-in');
+    showReducedMatrix(hasse);
+
+    if (isPoset) {
+        drawHasse(hasse);
+    } else {
+        document.getElementById('placeholder').style.display = '';
+        document.getElementById('placeholder').innerHTML = `
+            <div class="icon" style="color: var(--danger);">✗</div>
+            <div style="color: var(--danger);">No es un orden parcial — no se puede generar diagrama de Hasse</div>
+        `;
+        const canvas = document.getElementById('hasse-canvas');
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+// ===== INIT =====
+buildMatrix();
+</script>
 </body>
-
 </html>

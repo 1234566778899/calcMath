@@ -1,79 +1,701 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <title>Árboles de Huffman</title>
+    <title>Algoritmo de Huffman</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a24;
+            --surface-3: #22222e;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --text-muted: #555568;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.15);
+            --accent-glow-strong: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --success-glow: rgba(0, 206, 201, 0.12);
+            --warning: #fdcb6e;
+            --danger: #ff6b6b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ---- Navbar ---- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: 700;
+        }
+        .navbar-meta {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .navbar-meta .count-badge {
+            padding: 4px 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-dim);
+        }
+        .back-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover { color: var(--text); background: var(--surface-2); }
+
+        /* ---- Main layout ---- */
+        .main-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 32px;
+        }
+        .main-wrapper::-webkit-scrollbar { width: 6px; }
+        .main-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* ---- Toolbar ---- */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .input-pair {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 6px 8px;
+            transition: border-color 0.15s;
+        }
+        .input-pair:focus-within { border-color: var(--accent); }
+        .input-pair input {
+            width: 56px;
+            height: 26px;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            background: var(--surface-2);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color: var(--text);
+            outline: none;
+        }
+        .input-pair input::placeholder {
+            color: var(--text-muted);
+            font-family: var(--font);
+            font-size: 0.7rem;
+        }
+        .input-pair input:focus { border-color: var(--border-hover); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #5b4bd6; box-shadow: 0 2px 12px var(--accent-glow-strong); }
+        .btn-secondary { background: var(--surface-3); color: var(--text-dim); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+        .btn-danger { background: rgba(255,107,107,0.12); color: var(--danger); border: 1px solid rgba(255,107,107,0.2); }
+        .btn-danger:hover { background: rgba(255,107,107,0.2); }
+        .btn-success { background: rgba(0,206,201,0.12); color: var(--success); border: 1px solid rgba(0,206,201,0.2); }
+        .btn-success:hover { background: rgba(0,206,201,0.2); }
+        .btn-icon { width: 36px; padding: 8px 0; font-size: 1rem; }
+        .toolbar-sep {
+            width: 1px;
+            height: 28px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        /* ---- Cards ---- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .card-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 800px) { .card-row { grid-template-columns: 1fr; } }
+
+        /* ---- Canvas area ---- */
+        .canvas-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: center;
+        }
+        .canvas-wrapper::-webkit-scrollbar { height: 6px; }
+        .canvas-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .canvas-wrapper canvas { display: block; }
+
+        /* ---- Table ---- */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 3px;
+        }
+        .data-table thead th {
+            padding: 10px 14px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table tbody tr {
+            background: var(--surface-2);
+            transition: background 0.15s;
+        }
+        .data-table tbody tr:hover { background: var(--surface-3); }
+        .data-table tbody td,
+        .data-table tbody th {
+            padding: 10px 14px;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+        .data-table tbody th {
+            color: var(--accent-light);
+            font-weight: 600;
+            border-radius: var(--radius-xs) 0 0 var(--radius-xs);
+        }
+        .data-table tbody td:last-child { border-radius: 0 var(--radius-xs) var(--radius-xs) 0; }
+        .data-table tbody tr.row-total {
+            background: var(--accent-glow);
+        }
+        .data-table tbody tr.row-total th,
+        .data-table tbody tr.row-total td {
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+
+        /* ---- Result stats ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-card {
+            padding: 14px 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .stat-card .stat-value {
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .stat-card.highlight {
+            background: var(--accent-glow);
+            border-color: rgba(108, 92, 231, 0.2);
+        }
+        .stat-card.highlight .stat-value { color: var(--accent-light); }
+        .stat-card.highlight-green {
+            background: var(--success-glow);
+            border-color: rgba(0, 206, 201, 0.2);
+        }
+        .stat-card.highlight-green .stat-value { color: var(--success); }
+
+        /* ---- Toggle buttons ---- */
+        .view-toggle {
+            display: flex;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            overflow: hidden;
+        }
+        .view-toggle button {
+            flex: 1;
+            padding: 8px 16px;
+            font-family: var(--font);
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .view-toggle button:hover { color: var(--text); }
+        .view-toggle button.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* ---- View switching ---- */
+        .view-panel { display: none; animation: fadeIn 0.25s ease; }
+        .view-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ---- Hidden results ---- */
+        .results-section { display: none; }
+        .results-section.visible { display: block; }
+    </style>
 </head>
-
 <body>
-    <nav>
-        <div class="container-fluid p-4 border border-secondary text-center">
-            <a href="#" class="navbar-brand text-secondary">ÁRBOLES DE HUFFMAN (Comprensión de datos)</a>
-            <p class="cantidad mt-2 float-start">Cantidad: 6</p>
-        </div>
-    </nav>
-    <div class="container-fluid mt-3">
-        <div class="d-flex mb-3">
-            <button class="btn btn-warning" onclick="cambiarTamanio('-')">-</button>
-            <button class="btn btn-primary" onclick="cambiarTamanio('+')">+</button>
-            <div class="d-flex flex-wrap padre-input">
 
-            </div>
-            <button class="btn btn-success" onclick="resultado()">ACEPTAR</button>
-            <button class="btn btn-success btn-mostrar" onclick="mostrarArbol()">Mostrar árbol</button>
-            <button class="btn btn-danger" onclick="limpiarCanvas()">Limpiar</button>
-        </div>
-        <div class="w-100vh cj-canvas">
-            <canvas class="canvas mx-auto"></canvas>
-        </div>
-        <div class="row">
-            <div class="col">
+<nav class="navbar">
+    <a href="#" class="navbar-brand" onclick="history.back(); return false;">
+        <div class="brand-icon">H</div>
+        Algoritmo de Huffman
+    </a>
+    <div class="navbar-meta">
+        <span class="count-badge" id="count-badge">Nodos: 5</span>
+        <a href="#" class="back-link" onclick="history.back(); return false;">← Volver</a>
+    </div>
+</nav>
 
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">Carácter</th>
-                            <th scope="col">Frecuencia</th>
-                            <th scope="col">Huffman</th>
-                            <th scope="col">Bits</th>
-                        </tr>
-                    </thead>
-                    <tbody class="cuerpo">
-                        <tr class="fila">
-                            <th scope="row">-</th>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr class="fila">
-                            <th scope="row">-</th>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                    </tbody>
-                </table>
+<div class="main-wrapper">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button class="btn btn-secondary btn-icon" onclick="changeSize(-1)" title="Quitar nodo">−</button>
+        <button class="btn btn-secondary btn-icon" onclick="changeSize(1)" title="Agregar nodo">+</button>
+        <div class="toolbar-sep"></div>
+        <div id="input-container" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div class="toolbar-sep"></div>
+        <button class="btn btn-primary" onclick="computeHuffman()">Ejecutar</button>
+        <button class="btn btn-danger" onclick="clearAll()">Limpiar</button>
+    </div>
+
+    <!-- Results Section (hidden until computed) -->
+    <div class="results-section" id="results-section">
+
+        <!-- View Toggle -->
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+            <div class="view-toggle">
+                <button class="active" id="btn-tree" onclick="switchView('tree')">Árbol</button>
+                <button id="btn-table" onclick="switchView('table')">Tabla</button>
             </div>
-            <div class="col">
-                <div class="ps-5 cj-resultado">
-                    <h6 class="f1">Originalmente: 41x8=326</h6>
-                    <h6 class="f2">Huffman: 120 bits</h6>
-                    <h6 class="f3">(120/326)*100=36.5%</h6>
-                    <h6 class="f4">Se redujo a un 36.5%</h6>
+        </div>
+
+        <!-- Tree View -->
+        <div class="view-panel active" id="view-tree">
+            <div class="card" style="padding: 16px;">
+                <div class="canvas-wrapper">
+                    <canvas id="huffman-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="view-panel" id="view-table">
+            <div class="card-row">
+                <div class="card">
+                    <div class="card-title">Tabla de Códigos</div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Carácter</th>
+                                <th>Frecuencia</th>
+                                <th>Código</th>
+                                <th>Bits</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title">Resultados de Compresión</div>
+                    <div class="stats-grid" id="stats-grid"></div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<script>
+// ===== HUFFMAN ALGORITHM =====
+class HuffNode {
+    constructor(freq, char = '') {
+        this.freq = freq;
+        this.char = char;
+        this.left = null;
+        this.right = null;
+    }
+}
 
-    <script src="./js/bootstrap.bundle.min.js"></script>
-    <script src="./js/jquery.js"></script>
-    <script src="./js/main.js"></script>
+function buildHuffmanTree(freqs, chars) {
+    let nodes = freqs.map((f, i) => { const n = new HuffNode(f, chars[i]); return n; });
+    nodes.sort((a, b) => a.freq - b.freq);
+
+    while (nodes.length > 1) {
+        const left = nodes.shift();
+        const right = nodes.shift();
+        const parent = new HuffNode(left.freq + right.freq);
+        parent.left = left;
+        parent.right = right;
+        // Insert sorted
+        let inserted = false;
+        for (let i = 0; i < nodes.length; i++) {
+            if (parent.freq <= nodes[i].freq) {
+                nodes.splice(i, 0, parent);
+                inserted = true;
+                break;
+            }
+        }
+        if (!inserted) nodes.push(parent);
+    }
+    return nodes[0] || null;
+}
+
+function getCodes(node, prefix = '', codes = []) {
+    if (!node) return codes;
+    if (node.char !== '') {
+        codes.push({ char: node.char, freq: node.freq, code: prefix || '0' });
+    }
+    getCodes(node.left, prefix + '0', codes);
+    getCodes(node.right, prefix + '1', codes);
+    return codes;
+}
+
+// ===== TREE DRAWING =====
+function countFullNodes(node) {
+    if (!node) return 0;
+    const c = (node.left && node.right) ? 1 : 0;
+    return c + countFullNodes(node.left) + countFullNodes(node.right);
+}
+
+function drawTree(ctx, node, x, y, dpr) {
+    if (!node) return;
+    const spread = countFullNodes(node) * 14 + 10;
+
+    // Draw connecting lines first
+    if (node.left) {
+        const lx = x - spread, ly = y + 70;
+        ctx.beginPath();
+        ctx.strokeStyle = '#2a2a3a';
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(x, y + 22);
+        ctx.lineTo(lx, ly - 22);
+        ctx.stroke();
+        // Edge label
+        ctx.fillStyle = '#00cec9';
+        ctx.font = `600 ${11}px "JetBrains Mono"`;
+        ctx.textAlign = 'center';
+        ctx.fillText('0', (x + lx) / 2 - 10, (y + ly) / 2 - 4);
+    }
+    if (node.right) {
+        const rx = x + spread, ry = y + 70;
+        ctx.beginPath();
+        ctx.strokeStyle = '#2a2a3a';
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(x, y + 22);
+        ctx.lineTo(rx, ry - 22);
+        ctx.stroke();
+        ctx.fillStyle = '#fdcb6e';
+        ctx.font = `600 ${11}px "JetBrains Mono"`;
+        ctx.textAlign = 'center';
+        ctx.fillText('1', (x + rx) / 2 + 10, (y + ry) / 2 - 4);
+    }
+
+    // Draw node
+    const isLeaf = node.char !== '';
+    const r = 20;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (isLeaf) {
+        ctx.fillStyle = 'rgba(108, 92, 231, 0.25)';
+        ctx.fill();
+        ctx.strokeStyle = '#6c5ce7';
+        ctx.lineWidth = 2;
+    } else {
+        ctx.fillStyle = 'var(--surface-2)';
+        ctx.fill();
+        ctx.strokeStyle = '#3a3a50';
+        ctx.lineWidth = 1.5;
+    }
+    ctx.stroke();
+
+    // Node text
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (isLeaf) {
+        ctx.fillStyle = '#a29bfe';
+        ctx.font = `700 ${13}px "JetBrains Mono"`;
+        ctx.fillText(node.char, x, y - 3);
+        ctx.fillStyle = '#555568';
+        ctx.font = `500 ${9}px "JetBrains Mono"`;
+        ctx.fillText(node.freq, x, y + 10);
+    } else {
+        ctx.fillStyle = '#8888a0';
+        ctx.font = `600 ${12}px "JetBrains Mono"`;
+        ctx.fillText(node.freq, x, y);
+    }
+
+    // Recurse
+    if (node.left) drawTree(ctx, node.left, x - spread, y + 70, dpr);
+    if (node.right) drawTree(ctx, node.right, x + spread, y + 70, dpr);
+}
+
+function getTreeDepth(node) {
+    if (!node) return 0;
+    return 1 + Math.max(getTreeDepth(node.left), getTreeDepth(node.right));
+}
+
+function getTreeWidth(node) {
+    if (!node) return 1;
+    const spread = countFullNodes(node) * 14 + 10;
+    return spread + Math.max(getTreeWidth(node.left), getTreeWidth(node.right));
+}
+
+// ===== UI STATE =====
+let nodeCount = 5;
+
+function updateCountBadge() {
+    document.getElementById('count-badge').textContent = `Nodos: ${nodeCount}`;
+}
+
+function buildInputs() {
+    const container = document.getElementById('input-container');
+    container.innerHTML = '';
+    for (let i = 0; i < nodeCount; i++) {
+        const pair = document.createElement('div');
+        pair.className = 'input-pair';
+        pair.innerHTML = `<input type="text" placeholder="Letra" class="inp-char" maxlength="3"><input type="text" placeholder="Freq" class="inp-freq">`;
+        container.appendChild(pair);
+    }
+}
+
+function changeSize(d) {
+    const newSize = nodeCount + d;
+    if (newSize < 2 || newSize > 14) return;
+    // Save current values
+    const chars = document.querySelectorAll('.inp-char');
+    const freqs = document.querySelectorAll('.inp-freq');
+    const savedChars = Array.from(chars).map(i => i.value);
+    const savedFreqs = Array.from(freqs).map(i => i.value);
+    nodeCount = newSize;
+    buildInputs();
+    // Restore values
+    const newChars = document.querySelectorAll('.inp-char');
+    const newFreqs = document.querySelectorAll('.inp-freq');
+    for (let i = 0; i < Math.min(savedChars.length, nodeCount); i++) {
+        newChars[i].value = savedChars[i];
+        newFreqs[i].value = savedFreqs[i];
+    }
+    updateCountBadge();
+}
+
+function switchView(view) {
+    document.getElementById('btn-tree').classList.toggle('active', view === 'tree');
+    document.getElementById('btn-table').classList.toggle('active', view === 'table');
+    document.getElementById('view-tree').classList.toggle('active', view === 'tree');
+    document.getElementById('view-table').classList.toggle('active', view === 'table');
+}
+
+function clearAll() {
+    document.querySelectorAll('.inp-char').forEach(i => i.value = '');
+    document.querySelectorAll('.inp-freq').forEach(i => i.value = '');
+    document.getElementById('results-section').classList.remove('visible');
+    const canvas = document.getElementById('huffman-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function validateInputs() {
+    const chars = document.querySelectorAll('.inp-char');
+    const freqs = document.querySelectorAll('.inp-freq');
+    for (let i = 0; i < chars.length; i++) {
+        if (chars[i].value.trim() === '' || freqs[i].value.trim() === '' || isNaN(parseInt(freqs[i].value))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function computeHuffman() {
+    if (!validateInputs()) {
+        alert('Complete todos los campos con letras y frecuencias válidas.');
+        return;
+    }
+
+    const charInputs = document.querySelectorAll('.inp-char');
+    const freqInputs = document.querySelectorAll('.inp-freq');
+    const chars = Array.from(charInputs).map(i => i.value.trim());
+    const freqs = Array.from(freqInputs).map(i => parseInt(i.value));
+
+    // Build tree
+    const tree = buildHuffmanTree(freqs, chars);
+    if (!tree) return;
+
+    // Get codes
+    const codes = getCodes(tree);
+
+    // Draw tree
+    const canvas = document.getElementById('huffman-canvas');
+    const depth = getTreeDepth(tree);
+    const treeW = getTreeWidth(tree);
+    const canvasW = Math.max(600, treeW * 2.5 + 100);
+    const canvasH = Math.max(300, depth * 75 + 60);
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = canvasW + 'px';
+    canvas.style.height = canvasH + 'px';
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    drawTree(ctx, tree, canvasW / 2, 35, dpr);
+
+    // Populate table
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+    let totalFreq = 0;
+    let totalBits = 0;
+    codes.forEach(c => {
+        const bits = c.code.length * c.freq;
+        totalFreq += c.freq;
+        totalBits += bits;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<th>${c.char}</th><td>${c.freq}</td><td>${c.code}</td><td>${bits}</td>`;
+        tbody.appendChild(tr);
+    });
+    // Total row
+    const totalRow = document.createElement('tr');
+    totalRow.className = 'row-total';
+    totalRow.innerHTML = `<th>TOTAL</th><td>${totalFreq}</td><td>—</td><td>${totalBits}</td>`;
+    tbody.appendChild(totalRow);
+
+    // Stats
+    const originalBits = totalFreq * 8;
+    const ratio = ((totalBits / originalBits) * 100).toFixed(2);
+    const saved = (100 - ratio).toFixed(2);
+
+    const statsGrid = document.getElementById('stats-grid');
+    statsGrid.innerHTML = `
+        <div class="stat-card">
+            <div class="stat-label">Original (8 bits/char)</div>
+            <div class="stat-value">${totalFreq} × 8 = ${originalBits} bits</div>
+        </div>
+        <div class="stat-card highlight">
+            <div class="stat-label">Con Huffman</div>
+            <div class="stat-value">${totalBits} bits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Proporción</div>
+            <div class="stat-value">(${totalBits} / ${originalBits}) × 100 = ${ratio}%</div>
+        </div>
+        <div class="stat-card highlight-green">
+            <div class="stat-label">Reducción</div>
+            <div class="stat-value">Se redujo un ${saved}%</div>
+        </div>
+    `;
+
+    // Show results
+    document.getElementById('results-section').classList.add('visible');
+    switchView('tree');
+}
+
+// ===== INIT =====
+buildInputs();
+updateCountBadge();
+</script>
 </body>
-
 </html>

@@ -1,67 +1,662 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <title>Tablas de verdad</title>
-</head>
+    <title>Tablas de Verdad</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a24;
+            --surface-3: #22222e;
+            --border: #2a2a3a;
+            --border-hover: #3a3a50;
+            --text: #e8e8f0;
+            --text-dim: #8888a0;
+            --text-muted: #555568;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.15);
+            --accent-glow-strong: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --success-glow: rgba(0, 206, 201, 0.15);
+            --warning: #fdcb6e;
+            --danger: #ff6b6b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
+        /* Navbar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .navbar-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700; font-size: 0.95rem; color: var(--text); text-decoration: none;
+        }
+        .brand-icon {
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: white; font-weight: 700;
+        }
+        .back-link {
+            color: var(--text-dim); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+            padding: 6px 14px; border-radius: var(--radius-xs); transition: all 0.2s;
+        }
+        .back-link:hover { color: var(--text); background: var(--surface-2); }
+
+        /* Main */
+        .main-wrapper {
+            flex: 1; overflow-y: auto; padding: 28px 32px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .main-wrapper::-webkit-scrollbar { width: 6px; }
+        .main-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* Expression input area */
+        .expression-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            flex-shrink: 0;
+        }
+        .expression-label {
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 12px;
+        }
+        .expression-input-row {
+            display: flex; gap: 10px; align-items: center; margin-bottom: 20px;
+        }
+        .expression-display {
+            flex: 1; height: 52px; padding: 0 20px;
+            font-family: var(--mono); font-size: 1.1rem; font-weight: 600;
+            background: var(--surface-2); border: 2px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--accent-light);
+            outline: none; transition: border-color 0.2s; caret-color: var(--accent);
+        }
+        .expression-display:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .expression-display::placeholder { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 8px 16px; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+            border: none; border-radius: var(--radius-xs); cursor: pointer;
+            transition: all 0.15s; user-select: none;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #5b4bd6; box-shadow: 0 2px 12px var(--accent-glow-strong); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-danger { background: rgba(255,107,107,0.12); color: var(--danger); border: 1px solid rgba(255,107,107,0.2); }
+        .btn-danger:hover { background: rgba(255,107,107,0.2); }
+        .btn-lg { height: 52px; padding: 0 24px; font-size: 0.9rem; }
+
+        /* Keyboard */
+        .keyboard {
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyboard .key-section {
+            display: flex; gap: 6px; align-items: center;
+        }
+        .keyboard .key-divider {
+            width: 1px; height: 32px; background: var(--border); margin: 0 6px;
+        }
+        .key {
+            width: 48px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono); font-size: 0.9rem; font-weight: 600;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-xs); color: var(--text-dim);
+            cursor: pointer; transition: all 0.12s; user-select: none;
+        }
+        .key:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-hover); transform: translateY(-1px); }
+        .key:active { transform: translateY(0); }
+        .key.var { color: var(--accent-light); border-color: rgba(108,92,231,0.3); background: var(--accent-glow); }
+        .key.var:hover { background: var(--accent-glow-strong); }
+        .key.op { color: var(--warning); border-color: rgba(253,203,110,0.2); }
+        .key.op:hover { background: rgba(253,203,110,0.08); }
+        .key.wide { width: auto; padding: 0 14px; font-family: var(--font); font-size: 0.78rem; }
+
+        /* Operator legend */
+        .legend {
+            display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px;
+            padding-top: 14px; border-top: 1px solid var(--border);
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; color: var(--text-muted);
+        }
+        .legend-sym {
+            font-family: var(--mono); font-weight: 600; font-size: 0.8rem;
+            width: 24px; height: 22px; display: flex; align-items: center; justify-content: center;
+            background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
+            color: var(--warning);
+        }
+
+        /* Table area */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            flex: 1; min-height: 0; overflow: hidden;
+            display: none; flex-direction: column;
+        }
+        .table-card.visible { display: flex; }
+        .table-header-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+        }
+        .table-title {
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted);
+        }
+        .table-meta {
+            font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted);
+            display: flex; gap: 16px;
+        }
+        .table-scroll {
+            flex: 1; overflow: auto;
+        }
+        .table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .truth-table {
+            width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.82rem;
+        }
+        .truth-table thead { position: sticky; top: 0; z-index: 2; }
+        .truth-table thead th {
+            padding: 12px 16px; text-align: center;
+            font-weight: 600; font-size: 0.78rem;
+            background: var(--surface-2); color: var(--text-dim);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .truth-table thead th.var-col { color: var(--accent-light); }
+        .truth-table thead th.expr-col { color: var(--warning); }
+        .truth-table thead th.result-col {
+            color: var(--success);
+            background: rgba(0, 206, 201, 0.06);
+        }
+        .truth-table tbody td {
+            padding: 10px 16px; text-align: center;
+            border-bottom: 1px solid rgba(42,42,58,0.5);
+            color: var(--text-dim); font-weight: 500;
+            transition: background 0.1s;
+        }
+        .truth-table tbody tr:hover td { background: var(--surface-2); }
+        .truth-table tbody td.val-1 { color: var(--success); font-weight: 600; }
+        .truth-table tbody td.val-0 { color: var(--text-muted); }
+        .truth-table tbody td.result-cell { background: rgba(0, 206, 201, 0.04); }
+        .truth-table tbody td.result-cell.val-1 {
+            color: var(--success); font-weight: 700;
+            background: rgba(0, 206, 201, 0.08);
+        }
+
+        /* Classification badge */
+        .classification {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .class-badge {
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600;
+            font-family: var(--font);
+        }
+        .class-badge.tautology { background: rgba(0,206,201,0.15); color: var(--success); border: 1px solid rgba(0,206,201,0.3); }
+        .class-badge.contradiction { background: rgba(255,107,107,0.15); color: var(--danger); border: 1px solid rgba(255,107,107,0.3); }
+        .class-badge.contingency { background: rgba(253,203,110,0.15); color: var(--warning); border: 1px solid rgba(253,203,110,0.3); }
+
+        /* Implication arrow support */
+        .arrow-key { font-size: 0.75rem; }
+    </style>
+</head>
 <body>
-    <nav class="navbar border border-secondary">
-        <div class="container-fluid">
-            <a href="#Intrucciones" class="navbar-brand text-secondary ms-3">CALCULADORA ONLINE</a>
-            <div>
-                <a href="#inicio" class="navbar-brand text-secondary">INICIO</a>
-                <a href="#calculadoras" class="navbar-brand text-secondary">CALCULADORAS DE MATEMATICA</a>
+
+<nav class="navbar">
+    <a href="#" class="navbar-brand" onclick="history.back(); return false;">
+        <div class="brand-icon">⊤</div>
+        Tablas de Verdad
+    </a>
+    <a href="#" class="back-link" onclick="history.back(); return false;">← Volver</a>
+</nav>
+
+<div class="main-wrapper">
+
+    <!-- Expression Input -->
+    <div class="expression-card">
+        <div class="expression-label">Expresión lógica</div>
+        <div class="expression-input-row">
+            <input type="text" class="expression-display" id="expression"
+                   value="(~p^q)v(~q^~r)v(r^~s)"
+                   placeholder="Ej: (p^q)v(~r)"
+                   spellcheck="false"
+                   autocomplete="off">
+            <button class="btn btn-danger btn-lg" onclick="clearExpression()">AC</button>
+            <button class="btn btn-primary btn-lg" onclick="evaluateExpression()" id="btn-eval">Evaluar</button>
+        </div>
+
+        <!-- Keyboard -->
+        <div class="keyboard">
+            <div class="key-section">
+                <div class="key var" onclick="insertChar('p')">p</div>
+                <div class="key var" onclick="insertChar('q')">q</div>
+                <div class="key var" onclick="insertChar('r')">r</div>
+                <div class="key var" onclick="insertChar('s')">s</div>
+                <div class="key var" onclick="insertChar('t')">t</div>
+            </div>
+            <div class="key-divider"></div>
+            <div class="key-section">
+                <div class="key op" onclick="insertChar('~')" title="Negación (NOT)">~</div>
+                <div class="key op" onclick="insertChar('^')" title="Conjunción (AND)">^</div>
+                <div class="key op" onclick="insertChar('v')" title="Disyunción (OR)">v</div>
+                <div class="key op" onclick="insertChar('->')" title="Implicación">→</div>
+                <div class="key op" onclick="insertChar('<->')" title="Bicondicional">↔</div>
+            </div>
+            <div class="key-divider"></div>
+            <div class="key-section">
+                <div class="key" onclick="insertChar('(')">(</div>
+                <div class="key" onclick="insertChar(')')">)</div>
+            </div>
+            <div class="key-divider"></div>
+            <div class="key-section">
+                <div class="key wide" onclick="backspace()">← Borrar</div>
             </div>
         </div>
-    </nav>
-    <div class="container">
-        <h2 class="text-center my-4">Generador de tablas de verdad - Lógica preposicional, Algebra booleana</h2>
-        <div class="calculadora bg-secondary">
-            <div class="container-pantalla">
-                <input type="text" class="pantalla" value="(~p^q)v(~q^~r)v(r^~s)">
-            </div>
-            <div class="botones d-flex flex-wrap justify-content-center bg-light">
-                <button class="boton btn btn-danger" onclick="limpiar()">AC</button>
-                <button class="boton btn btn-success" onclick="obtenerDatos()">=</button>
-                <button class="boton btn btn-primary" onclick="obtenerTecla('p')">p</button>
-                <button class="boton btn btn-primary" onclick="obtenerTecla('q')">q</button>
-                <button class="boton btn btn-primary" onclick="obtenerTecla('r')">r</button>
-                <button class="boton btn btn-primary" onclick="obtenerTecla('s')">s</button>
-                <button class="boton btn btn-secondary">+</button>
-                <button class="boton btn btn-secondary" onclick="obtenerTecla('~')">~</button>
-                <button class="boton btn btn-secondary" onclick="obtenerTecla('^')">^</button>
-                <button class="boton btn btn-secondary" onclick="obtenerTecla('v')">v</button>
-                <button class="boton btn btn-secondary"onclick="obtenerTecla('(')">(</button>
-                <button class="boton btn btn-secondary" onclick="obtenerTecla(')')">)</button>
-                <button class="boton btn btn-warning">LEFT</button>
-                <button class="boton btn btn-warning">RIGHT</button>             
-                <button class="boton btn btn-success">=</button>             
-            </div>
-        </div>
-        <div class="my-5 text-center contenedor-tabla">
-            <table class="table table-bordered">
-                <thead>
-                  <tr class="tabla-cabecera">
-                   
-                  </tr>
-                </thead>
-                <tbody class="tabla-cuerpo">
-                  
-                </tbody>
-              </table>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-sym">~</div> NOT (negación)</div>
+            <div class="legend-item"><div class="legend-sym">^</div> AND (conjunción)</div>
+            <div class="legend-item"><div class="legend-sym">v</div> OR (disyunción)</div>
+            <div class="legend-item"><div class="legend-sym">→</div> Implicación</div>
+            <div class="legend-item"><div class="legend-sym">↔</div> Bicondicional</div>
         </div>
     </div>
 
+    <!-- Truth Table -->
+    <div class="table-card" id="table-card">
+        <div class="table-header-bar">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="table-title">Tabla de Verdad</div>
+                <div class="classification" id="classification"></div>
+            </div>
+            <div class="table-meta">
+                <span id="meta-vars">—</span>
+                <span id="meta-rows">—</span>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="truth-table">
+                <thead><tr id="table-head"></tr></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-    <script src="./js/bootstrap.bundle.min.js"></script>
-    <script src="./js/jquery.js"></script>
-    <script src="./js/main.js"></script>
+<script>
+// ===== EXPRESSION INPUT =====
+const exprInput = document.getElementById('expression');
+
+function insertChar(ch) {
+    const start = exprInput.selectionStart;
+    const end = exprInput.selectionEnd;
+    const val = exprInput.value;
+    exprInput.value = val.slice(0, start) + ch + val.slice(end);
+    const pos = start + ch.length;
+    exprInput.setSelectionRange(pos, pos);
+    exprInput.focus();
+}
+
+function backspace() {
+    const start = exprInput.selectionStart;
+    const val = exprInput.value;
+    if (start === 0) return;
+    // Check for multi-char tokens
+    let del = 1;
+    if (val.slice(start - 3, start) === '<->') del = 3;
+    else if (val.slice(start - 2, start) === '->') del = 2;
+    exprInput.value = val.slice(0, start - del) + val.slice(start);
+    exprInput.setSelectionRange(start - del, start - del);
+    exprInput.focus();
+}
+
+function clearExpression() {
+    exprInput.value = '';
+    exprInput.focus();
+    document.getElementById('table-card').classList.remove('visible');
+}
+
+exprInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); evaluateExpression(); }
+});
+
+// ===== TOKENIZER =====
+function tokenize(expr) {
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length) {
+        const ch = expr[i];
+        if (ch === ' ') { i++; continue; }
+        if ('pqrst'.includes(ch)) { tokens.push({ type: 'VAR', value: ch }); i++; }
+        else if (ch === '~') { tokens.push({ type: 'NOT' }); i++; }
+        else if (ch === '^') { tokens.push({ type: 'AND' }); i++; }
+        else if (ch === 'v' && (i === 0 || !'pqrst'.includes(expr[i-1]))) {
+            // Disambiguate: 'v' after a variable closing paren/var is OR, otherwise could be var
+            // Check context: if previous token is a value-like, it's OR
+            const prev = tokens.length > 0 ? tokens[tokens.length - 1] : null;
+            if (prev && (prev.type === 'VAR' || prev.type === 'RPAREN' || prev.type === 'VAL')) {
+                tokens.push({ type: 'OR' }); i++;
+            } else {
+                // Could be variable 'v' — but in this calculator v is always OR
+                // Check if it looks like OR context
+                tokens.push({ type: 'OR' }); i++;
+            }
+        }
+        else if (ch === '(') { tokens.push({ type: 'LPAREN' }); i++; }
+        else if (ch === ')') { tokens.push({ type: 'RPAREN' }); i++; }
+        else if (expr.slice(i, i+3) === '<->') { tokens.push({ type: 'BICOND' }); i += 3; }
+        else if (expr.slice(i, i+2) === '->') { tokens.push({ type: 'IMPL' }); i += 2; }
+        else if (ch === '→') { tokens.push({ type: 'IMPL' }); i++; }
+        else if (ch === '↔') { tokens.push({ type: 'BICOND' }); i++; }
+        else if (ch === '0') { tokens.push({ type: 'VAL', value: 0 }); i++; }
+        else if (ch === '1') { tokens.push({ type: 'VAL', value: 1 }); i++; }
+        else { throw new Error(`Carácter inesperado: '${ch}' en posición ${i}`); }
+    }
+    return tokens;
+}
+
+// ===== PARSER (recursive descent) =====
+// Precedence (low to high): BICOND, IMPL, OR, AND, NOT
+// Grammar:
+//   expr       → bicond
+//   bicond     → impl ( '<->' impl )*
+//   impl       → or ( '->' or )*     (right-associative)
+//   or         → and ( 'v' and )*
+//   and        → not ( '^' not )*
+//   not        → '~' not | atom
+//   atom       → VAR | '(' expr ')'
+
+function parse(tokens) {
+    let pos = 0;
+
+    function peek() { return pos < tokens.length ? tokens[pos] : null; }
+    function consume(type) {
+        if (pos >= tokens.length) throw new Error('Expresión incompleta');
+        if (type && tokens[pos].type !== type) throw new Error(`Esperado ${type}, encontrado ${tokens[pos].type}`);
+        return tokens[pos++];
+    }
+
+    function parseBicond() {
+        let left = parseImpl();
+        while (peek() && peek().type === 'BICOND') {
+            consume('BICOND');
+            const right = parseImpl();
+            left = { type: 'BICOND', left, right };
+        }
+        return left;
+    }
+
+    function parseImpl() {
+        let left = parseOr();
+        if (peek() && peek().type === 'IMPL') {
+            consume('IMPL');
+            const right = parseImpl(); // right-associative
+            return { type: 'IMPL', left, right };
+        }
+        return left;
+    }
+
+    function parseOr() {
+        let left = parseAnd();
+        while (peek() && peek().type === 'OR') {
+            consume('OR');
+            const right = parseAnd();
+            left = { type: 'OR', left, right };
+        }
+        return left;
+    }
+
+    function parseAnd() {
+        let left = parseNot();
+        while (peek() && peek().type === 'AND') {
+            consume('AND');
+            const right = parseNot();
+            left = { type: 'AND', left, right };
+        }
+        return left;
+    }
+
+    function parseNot() {
+        if (peek() && peek().type === 'NOT') {
+            consume('NOT');
+            const operand = parseNot();
+            return { type: 'NOT', operand };
+        }
+        return parseAtom();
+    }
+
+    function parseAtom() {
+        const t = peek();
+        if (!t) throw new Error('Expresión incompleta');
+        if (t.type === 'VAR') { consume(); return { type: 'VAR', name: t.value }; }
+        if (t.type === 'VAL') { consume(); return { type: 'VAL', value: t.value }; }
+        if (t.type === 'LPAREN') {
+            consume('LPAREN');
+            const inner = parseBicond();
+            consume('RPAREN');
+            return inner;
+        }
+        throw new Error(`Token inesperado: ${t.type}`);
+    }
+
+    const ast = parseBicond();
+    if (pos < tokens.length) throw new Error('Tokens sobrantes al final');
+    return ast;
+}
+
+// ===== EVALUATOR =====
+function evalAST(ast, env) {
+    switch (ast.type) {
+        case 'VAR': return env[ast.name] ? 1 : 0;
+        case 'VAL': return ast.value;
+        case 'NOT': return evalAST(ast.operand, env) ? 0 : 1;
+        case 'AND': return (evalAST(ast.left, env) && evalAST(ast.right, env)) ? 1 : 0;
+        case 'OR': return (evalAST(ast.left, env) || evalAST(ast.right, env)) ? 1 : 0;
+        case 'IMPL': return (!evalAST(ast.left, env) || evalAST(ast.right, env)) ? 1 : 0;
+        case 'BICOND': return (evalAST(ast.left, env) === evalAST(ast.right, env)) ? 1 : 0;
+        default: throw new Error(`Nodo desconocido: ${ast.type}`);
+    }
+}
+
+function getVars(ast, vars = new Set()) {
+    if (ast.type === 'VAR') vars.add(ast.name);
+    if (ast.left) getVars(ast.left, vars);
+    if (ast.right) getVars(ast.right, vars);
+    if (ast.operand) getVars(ast.operand, vars);
+    return vars;
+}
+
+// ===== SUBEXPRESSION EXTRACTION =====
+function exprToString(ast) {
+    switch (ast.type) {
+        case 'VAR': return ast.name;
+        case 'VAL': return '' + ast.value;
+        case 'NOT': {
+            const inner = exprToString(ast.operand);
+            return `~${inner.length > 1 && ast.operand.type !== 'VAR' ? '('+inner+')' : inner}`;
+        }
+        case 'AND': return wrapBin(ast, '^');
+        case 'OR': return wrapBin(ast, 'v');
+        case 'IMPL': return wrapBin(ast, '→');
+        case 'BICOND': return wrapBin(ast, '↔');
+    }
+}
+function wrapBin(ast, op) {
+    const l = exprToString(ast.left);
+    const r = exprToString(ast.right);
+    const needParenL = needsParen(ast.left, ast, 'left');
+    const needParenR = needsParen(ast.right, ast, 'right');
+    return `${needParenL ? '('+l+')' : l}${op}${needParenR ? '('+r+')' : r}`;
+}
+function precedence(type) {
+    switch(type) {
+        case 'BICOND': return 1;
+        case 'IMPL': return 2;
+        case 'OR': return 3;
+        case 'AND': return 4;
+        case 'NOT': return 5;
+        default: return 6;
+    }
+}
+function needsParen(child, parent, side) {
+    if (child.type === 'VAR' || child.type === 'VAL' || child.type === 'NOT') return false;
+    return precedence(child.type) < precedence(parent.type);
+}
+
+function getSubExpressions(ast, subs = [], seen = new Set()) {
+    if (ast.type === 'VAR' || ast.type === 'VAL') return subs;
+    if (ast.operand) getSubExpressions(ast.operand, subs, seen);
+    if (ast.left) getSubExpressions(ast.left, subs, seen);
+    if (ast.right) getSubExpressions(ast.right, subs, seen);
+    const str = exprToString(ast);
+    if (!seen.has(str)) {
+        seen.add(str);
+        subs.push({ ast, label: str });
+    }
+    return subs;
+}
+
+// ===== MAIN EVALUATE =====
+function evaluateExpression() {
+    const raw = exprInput.value.trim();
+    if (!raw) return;
+
+    let tokens, ast;
+    try {
+        tokens = tokenize(raw);
+        ast = parse(tokens);
+    } catch (e) {
+        alert('Error en la expresión: ' + e.message);
+        return;
+    }
+
+    const vars = [...getVars(ast)].sort();
+    const n = vars.length;
+    const rows = Math.pow(2, n);
+
+    // Get sub-expressions (intermediate columns)
+    const subs = getSubExpressions(ast);
+    const fullExpr = exprToString(ast);
+    // Remove the full expression from subs if present (we'll add it as the last column)
+    const intermediateSubs = subs.filter(s => s.label !== fullExpr);
+
+    // Build header
+    const thead = document.getElementById('table-head');
+    thead.innerHTML = '';
+    vars.forEach(v => {
+        const th = document.createElement('th');
+        th.className = 'var-col';
+        th.textContent = v;
+        thead.appendChild(th);
+    });
+    intermediateSubs.forEach(s => {
+        const th = document.createElement('th');
+        th.className = 'expr-col';
+        th.textContent = s.label;
+        thead.appendChild(th);
+    });
+    const thResult = document.createElement('th');
+    thResult.className = 'result-col';
+    thResult.textContent = fullExpr;
+    thead.appendChild(thResult);
+
+    // Build rows
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+    let trueCount = 0;
+
+    for (let i = 0; i < rows; i++) {
+        const env = {};
+        vars.forEach((v, idx) => {
+            env[v] = (i >> (n - 1 - idx)) & 1;
+        });
+
+        const tr = document.createElement('tr');
+
+        // Variable values
+        vars.forEach(v => {
+            const td = document.createElement('td');
+            td.textContent = env[v];
+            td.className = env[v] ? 'val-1' : 'val-0';
+            tr.appendChild(td);
+        });
+
+        // Intermediate sub-expressions
+        intermediateSubs.forEach(s => {
+            const val = evalAST(s.ast, env);
+            const td = document.createElement('td');
+            td.textContent = val;
+            td.className = val ? 'val-1' : 'val-0';
+            tr.appendChild(td);
+        });
+
+        // Result
+        const result = evalAST(ast, env);
+        if (result) trueCount++;
+        const tdR = document.createElement('td');
+        tdR.textContent = result;
+        tdR.className = `result-cell ${result ? 'val-1' : 'val-0'}`;
+        tr.appendChild(tdR);
+
+        tbody.appendChild(tr);
+    }
+
+    // Classification
+    const classEl = document.getElementById('classification');
+    classEl.innerHTML = '';
+    const badge = document.createElement('span');
+    badge.className = 'class-badge';
+    if (trueCount === rows) {
+        badge.classList.add('tautology');
+        badge.textContent = 'Tautología';
+    } else if (trueCount === 0) {
+        badge.classList.add('contradiction');
+        badge.textContent = 'Contradicción';
+    } else {
+        badge.classList.add('contingency');
+        badge.textContent = 'Contingencia';
+    }
+    classEl.appendChild(badge);
+
+    // Meta
+    document.getElementById('meta-vars').textContent = `${n} variables`;
+    document.getElementById('meta-rows').textContent = `${rows} filas`;
+
+    // Show table
+    document.getElementById('table-card').classList.add('visible');
+}
+</script>
 </body>
-
 </html>
